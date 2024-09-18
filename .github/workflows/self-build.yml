@@ -44,7 +44,9 @@ env:
   RENDEZVOUS_SERVER: "${{ secrets.RENDEZVOUS_SERVER }}"
   API_SERVER: "${{ secrets.API_SERVER }}"
   UPLOAD_ARTIFACT: "${{ inputs.upload-artifact }}"
-  SIGN_BASE_URL: "${{ secrets.SIGN_BASE_URL }}"
+  RENDEZVOUS_PORT: "${{ secrets.RENDEZVOUS_PORT }}"
+  RELAY_PORT: "${{ secrets.RELAY_PORT }}"
+  
 
 jobs:
   build-RustDeskTempTopMostWindow:

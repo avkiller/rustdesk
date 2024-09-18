@@ -112,13 +112,13 @@ pub const RS_PUB_KEY: &str = match option_env!("RS_PUB_KEY") {
 //pub const RELAY_PORT: i32 = 21117;
 
 pub const RENDEZVOUS_PORT: i32 = match option_env!("RENDEZVOUS_PORT") {
-    Some(key) if !key.is_empty() => key.parse::<i32>().ok(),
+    Some(key) if !key.is_empty() => key.parse::<i32>().ok().expect("fail port"),
     _ => 21116,
 };
 
 
 pub const RELAY_PORT: i32 = match option_env!("RELAY_PORT") {
-    Some(key) if !key.is_empty() => key.parse::<i32>().ok(),
+    Some(key) if !key.is_empty() => key.parse::<i32>().ok().expect("fail port"),
     _ => 21117,
 };
 

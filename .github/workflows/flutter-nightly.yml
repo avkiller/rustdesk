@@ -1,6 +1,6 @@
 name: Flutter Nightly Build
 
-on:
+off:
   schedule:
     # schedule build every night
     - cron: "0 0 * * *"

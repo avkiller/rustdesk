@@ -112,13 +112,16 @@ pub const RS_PUB_KEY: &str = match option_env!("RS_PUB_KEY") {
 //pub const RELAY_PORT: i32 = 21117;
 
 pub const RENDEZVOUS_PORT: i32 = match option_env!("RENDEZVOUS_PORT") {
-    Some(key) if !key.is_empty() => key.parse::<i32>().unwrap_or(21116),
+    Some(key) if !key.is_empty() => match key.parse::<i32>()｛
+        Ok(value) => value,
+        _ => 21116
+        ｝
     _ => 21116,
 };
 
 
 pub const RELAY_PORT: i32 = match option_env!("RELAY_PORT") {
-    Some(key) if !key.is_empty() => key.parse::<i32>().unwrap_or(21117),
+    Some(key) if !key.is_empty() => key.parse::<i32>()？,
     _ => 21117,
 };
 

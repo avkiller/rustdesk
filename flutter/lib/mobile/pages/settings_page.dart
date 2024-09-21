@@ -604,25 +604,25 @@ class _SettingsState extends State<SettingsPage> with WidgetsBindingObserver {
     final settings = SettingsList(
       sections: [
         customClientSection,
-        if (!bind.isDisableAccount())
-          SettingsSection(
-            title: Text(translate('Account')),
-            tiles: [
-              SettingsTile(
-                title: Obx(() => Text(gFFI.userModel.userName.value.isEmpty
-                    ? translate('Login')
-                    : '${translate('Logout')} (${gFFI.userModel.userName.value})')),
-                leading: Icon(Icons.person),
-                onPressed: (context) {
-                  if (gFFI.userModel.userName.value.isEmpty) {
-                    loginDialog();
-                  } else {
-                    logOutConfirmDialog();
-                  }
-                },
-              ),
-            ],
-          ),
+        // if (!bind.isDisableAccount())
+        //   SettingsSection(
+        //     title: Text(translate('Account')),
+        //     tiles: [
+        //       SettingsTile(
+        //         title: Obx(() => Text(gFFI.userModel.userName.value.isEmpty
+        //             ? translate('Login')
+        //             : '${translate('Logout')} (${gFFI.userModel.userName.value})')),
+        //         leading: Icon(Icons.person),
+        //         onPressed: (context) {
+        //           if (gFFI.userModel.userName.value.isEmpty) {
+        //             loginDialog();
+        //           } else {
+        //             logOutConfirmDialog();
+        //           }
+        //         },
+        //       ),
+        //     ],
+        //   ),
         SettingsSection(title: Text(translate("Settings")), tiles: [
           if (!disabledSettings && !_hideNetwork && !_hideServer)
             SettingsTile(

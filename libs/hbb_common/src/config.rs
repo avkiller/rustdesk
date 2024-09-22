@@ -1714,7 +1714,7 @@ impl UserDefaultConfig {
             keys::OPTION_IMAGE_QUALITY => {
                 self.get_string(key, "low", vec!["best", "low", "custom", "balanced"])
             }
-            keys:: => {
+            keys:: OPTION_CODEC_PREFERENCE => {
                 self.get_string(key, "auto", vec!["vp8", "vp9", "av1", "h264", "h265"])
             }
             keys::OPTION_CUSTOM_IMAGE_QUALITY => {

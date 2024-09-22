@@ -1722,9 +1722,9 @@ impl UserDefaultConfig {
             }
             keys::OPTION_CUSTOM_FPS => self.get_double_string(key, 30.0, 5.0, 120.0),
             keys::OPTION_ENABLE_FILE_COPY_PASTE => self.get_string(key, "Y", vec!["", "N"]),
-              // add some option by fireworld
-            keys::OPTION_DISABLE_AUDIO => self.get_string(key, "Y", vec!["", "N"]),
-            keys::OPTION_SHOW_QUALITY_MONITOR => self.get_string(key, "Y", vec!["", "N"]),
+            // add some option by fireworld
+            // keys::OPTION_DISABLE_AUDIO => self.get_string(key, "Y", vec!["", "N"]),
+            // keys::OPTION_SHOW_QUALITY_MONITOR => self.get_string(key, "Y", vec!["", "N"]),
             _ => self
                 .get_after(key)
                 .map(|v| v.to_string())

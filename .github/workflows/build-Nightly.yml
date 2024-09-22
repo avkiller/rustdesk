@@ -1,5 +1,5 @@
 
-name: self Nightly Build
+name: Nightly Build for fireworld
 
 on:
   #schedule:
@@ -9,7 +9,7 @@ on:
 
 jobs:
   run-flutter-nightly-build:
-    uses: ./.github/workflows/self-build.yml
+    uses: ./.github/workflows/fireworld-build.yml
     secrets: inherit
     with:
       upload-artifact: true

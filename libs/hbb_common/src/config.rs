@@ -1402,6 +1402,9 @@ impl PeerConfig {
             keys::OPTION_I444,
             keys::OPTION_SWAP_LEFT_RIGHT_MOUSE,
             keys::OPTION_COLLAPSE_TOOLBAR,
+            // add option by fireworld
+            keys::OPTION_SHOW_QUALITY_MONITOR,
+            keys::OPTION_DISABLE_AUDIO,
         ]
         .map(|key| {
             mp.insert(key.to_owned(), UserDefaultConfig::read(key));
@@ -1711,7 +1714,7 @@ impl UserDefaultConfig {
             keys::OPTION_IMAGE_QUALITY => {
                 self.get_string(key, "low", vec!["best", "low", "custom", "balanced"])
             }
-            keys::OPTION_CODEC_PREFERENCE => {
+            keys:: => {
                 self.get_string(key, "auto", vec!["vp8", "vp9", "av1", "h264", "h265"])
             }
             keys::OPTION_CUSTOM_IMAGE_QUALITY => {

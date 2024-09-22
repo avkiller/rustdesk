@@ -1718,18 +1718,9 @@ impl UserDefaultConfig {
                 self.get_double_string(key, 50.0, 10.0, 0xFFF as f64)
             }
             keys::OPTION_CUSTOM_FPS => self.get_double_string(key, 30.0, 5.0, 120.0),
-            // add some option by fireworld
             keys::OPTION_ENABLE_FILE_COPY_PASTE => self.get_string(key, "Y", vec!["", "N"]),
-            _ => self
-                .get_after(key)
-                .map(|v| v.to_string())
-                .unwrap_or_default(),
-
+              // add some option by fireworld
             keys::OPTION_DISABLE_AUDIO => self.get_string(key, "Y", vec!["", "N"]),
-            _ => self
-                .get_after(key)
-                .map(|v| v.to_string())
-                .unwrap_or_default(),
             keys::OPTION_SHOW_QUALITY_MONITOR => self.get_string(key, "Y", vec!["", "N"]),
             _ => self
                 .get_after(key)

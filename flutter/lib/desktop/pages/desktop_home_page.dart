@@ -410,18 +410,18 @@ class _DesktopHomePageState extends State<DesktopHomePage>
   }
 
   Future<Widget> buildHelpCards() async {
-    if (!bind.isCustomClient() &&
-        updateUrl.isNotEmpty &&
-        !isCardClosed &&
-        bind.mainUriPrefixSync().contains('rustdesk')) {
-      return buildInstallCard(
-          "Status",
-          "There is a newer version of ${bind.mainGetAppNameSync()} ${bind.mainGetNewVersion()} available.",
-          "Click to download", () async {
-        final Uri url = Uri.parse('https://rustdesk.com/download');
-        await launchUrl(url);
-      }, closeButton: true);
-    }
+    // if (!bind.isCustomClient() &&
+    //     updateUrl.isNotEmpty &&
+    //     !isCardClosed &&
+    //     bind.mainUriPrefixSync().contains('rustdesk')) {
+    //   return buildInstallCard(
+    //       "Status",
+    //       "There is a newer version of ${bind.mainGetAppNameSync()} ${bind.mainGetNewVersion()} available.",
+    //       "Click to download", () async {
+    //     final Uri url = Uri.parse('https://rustdesk.com/download');
+    //     await launchUrl(url);
+    //   }, closeButton: true);
+    // }
     if (systemError.isNotEmpty) {
       return buildInstallCard("", systemError, "", () {});
     }

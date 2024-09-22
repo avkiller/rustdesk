@@ -765,7 +765,7 @@ class _SettingsState extends State<SettingsPage> with WidgetsBindingObserver {
             //   onPressed: (context) =>
             //       launchUrlString('https://rustdesk.com/privacy.html'),
             //   leading: Icon(Icons.privacy_tip),
-            )
+            // )
           ],
         ),
       ],

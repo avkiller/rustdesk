@@ -7,6 +7,7 @@ import 'dart:html';
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter_hbb/models/state_model.dart';
 
 import 'package:flutter_hbb/web/bridge.dart';
 import 'package:flutter_hbb/common.dart';
@@ -28,7 +29,15 @@ class PlatformFFI {
     context.callMethod('setByName', [name, value]);
   }
 
-  PlatformFFI._();
+  PlatformFFI._() {
+    window.document.addEventListener(
+        'visibilitychange',
+        (event) => {
+              stateGlobal.isWebVisible =
+                  window.document.visibilityState == 'visible'
+            });
+  }
+
   static final PlatformFFI instance = PlatformFFI._();
 
   static get localeName => window.navigator.language;
@@ -157,4 +166,10 @@ class PlatformFFI {
 
   // just for compilation
   void syncAndroidServiceAppDirConfigPath() {}
+
+  void setFullscreenCallback(void Function(bool) fun) {
+    context["onFullscreenChanged"] = (bool v) {
+      fun(v);
+    };
+  }
 }

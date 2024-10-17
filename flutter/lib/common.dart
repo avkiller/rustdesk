@@ -30,6 +30,7 @@ import 'common/widgets/overlay.dart';
 import 'mobile/pages/file_manager_page.dart';
 import 'mobile/pages/remote_page.dart';
 import 'desktop/pages/remote_page.dart' as desktop_remote;
+import 'desktop/pages/file_manager_page.dart' as desktop_file_manager;
 import 'package:flutter_hbb/desktop/widgets/remote_toolbar.dart';
 import 'models/model.dart';
 import 'models/platform_model.dart';
@@ -554,7 +555,7 @@ class MyTheme {
     return themeModeFromString(bind.mainGetLocalOption(key: kCommConfKeyTheme));
   }
 
-  static void changeDarkMode(ThemeMode mode) async {
+  static Future<void> changeDarkMode(ThemeMode mode) async {
     Get.changeThemeMode(mode);
     if (desktopType == DesktopType.main || isAndroid || isIOS || isWeb) {
       if (mode == ThemeMode.system) {
@@ -2370,20 +2371,35 @@ connect(BuildContext context, String id,
     }
   } else {
     if (isFileTransfer) {
-      if (!await AndroidPermissionManager.check(kManageExternalStorage)) {
-        if (!await AndroidPermissionManager.request(kManageExternalStorage)) {
-          return;
+      if (isAndroid) {
+        if (!await AndroidPermissionManager.check(kManageExternalStorage)) {
+          if (!await AndroidPermissionManager.request(kManageExternalStorage)) {
+            return;
+          }
         }
       }
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (BuildContext context) => FileManagerPage(
-              id: id, password: password, isSharedPassword: isSharedPassword),
-        ),
-      );
+      if (isWeb) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (BuildContext context) =>
+                desktop_file_manager.FileManagerPage(
+                    id: id,
+                    password: password,
+                    isSharedPassword: isSharedPassword),
+          ),
+        );
+      } else {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (BuildContext context) => FileManagerPage(
+                id: id, password: password, isSharedPassword: isSharedPassword),
+          ),
+        );
+      }
     } else {
-      if (isWebDesktop) {
+      if (isWeb) {
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -3600,3 +3616,7 @@ List<SubWindowResizeEdge>? get subWindowManagerEnableResizeEdges => isWindows
         SubWindowResizeEdge.topRight,
       ]
     : null;
+
+void earlyAssert() {
+  assert('\1' == '1');
+}

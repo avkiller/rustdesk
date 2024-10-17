@@ -155,9 +155,9 @@ class _RemotePageState extends State<RemotePage> {
     var oldValue = _value;
     _value = newValue;
     var i = newValue.length - 1;
-    for (; i >= 0 && newValue[i] != '\1'; --i) {}
+    for (; i >= 0 && newValue[i] != '1'; --i) {}
     var j = oldValue.length - 1;
-    for (; j >= 0 && oldValue[j] != '\1'; --j) {}
+    for (; j >= 0 && oldValue[j] != '1'; --j) {}
     if (i < j) j = i;
     var subNewValue = newValue.substring(j + 1);
     var subOldValue = oldValue.substring(j + 1);
@@ -206,8 +206,8 @@ class _RemotePageState extends State<RemotePage> {
     _value = newValue;
     if (oldValue.isNotEmpty &&
         newValue.isNotEmpty &&
-        oldValue[0] == '\1' &&
-        newValue[0] != '\1') {
+        oldValue[0] == '1' &&
+        newValue[0] != '1') {
       // clipboard
       oldValue = '';
     }
@@ -242,10 +242,14 @@ class _RemotePageState extends State<RemotePage> {
     }
   }
 
-  // handle mobile virtual keyboard
-  void handleSoftKeyboardInput(String newValue) {
+  Future<void> handleSoftKeyboardInput(String newValue) async {
     if (isIOS) {
-      _handleIOSSoftKeyboardInput(newValue);
+      // fix: TextFormField onChanged event triggered multiple times when Korean input
+      // https://github.com/rustdesk/rustdesk/pull/9644
+      await Future.delayed(const Duration(milliseconds: 10));
+
+      if (newValue != _textController.text) return;
+      _handleIOSSoftKeyboardInput(_textController.text);
     } else {
       _handleNonIOSSoftKeyboardInput(newValue);
     }

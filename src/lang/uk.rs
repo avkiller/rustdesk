@@ -130,7 +130,7 @@ pub static ref T: std::collections::HashMap<&'static str, &'static str> =
         ("Show quality monitor", "Показати якість"),
         ("Disable clipboard", "Вимкнути буфер обміну"),
         ("Lock after session end", "Блокування після завершення сеансу"),
-        ("Insert", "Вставити"),
+        ("Insert Ctrl + Alt + Del", "Вставити Ctrl + Alt + Del"),
         ("Insert Lock", "Встановити замок"),
         ("Refresh", "Оновити"),
         ("ID does not exist", "ID не існує"),
@@ -364,6 +364,7 @@ pub static ref T: std::collections::HashMap<&'static str, &'static str> =
         ("Recording", "Запис"),
         ("Directory", "Директорія"),
         ("Automatically record incoming sessions", "Автоматично записувати вхідні сеанси"),
+        ("Automatically record outgoing sessions", ""),
         ("Change", "Змінити"),
         ("Start session recording", "Розпочати запис сеансу"),
         ("Stop session recording", "Закінчити запис сеансу"),
@@ -651,5 +652,6 @@ pub static ref T: std::collections::HashMap<&'static str, &'static str> =
         ("Download", ""),
         ("Upload folder", ""),
         ("Upload files", ""),
+        ("Clipboard is synchronized", ""),
     ].iter().cloned().collect();
 }

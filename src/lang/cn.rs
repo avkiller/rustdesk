@@ -130,7 +130,7 @@ pub static ref T: std::collections::HashMap<&'static str, &'static str> =
         ("Show quality monitor", "显示质量监测"),
         ("Disable clipboard", "禁用剪贴板"),
         ("Lock after session end", "会话结束后锁定远程电脑"),
-        ("Insert", "插入"),
+        ("Insert Ctrl + Alt + Del", "插入 Ctrl + Alt + Del"),
         ("Insert Lock", "锁定远程电脑"),
         ("Refresh", "刷新画面"),
         ("ID does not exist", "ID 不存在"),
@@ -363,7 +363,8 @@ pub static ref T: std::collections::HashMap<&'static str, &'static str> =
         ("Unpin Toolbar", "取消固定工具栏"),
         ("Recording", "录屏"),
         ("Directory", "目录"),
-        ("Automatically record incoming sessions", "自动录制来访会话"),
+        ("Automatically record incoming sessions", "自动录制传入会话"),
+        ("Automatically record outgoing sessions", "自动录制传出会话"),
         ("Change", "更改"),
         ("Start session recording", "开始录屏"),
         ("Stop session recording", "结束录屏"),
@@ -651,5 +652,6 @@ pub static ref T: std::collections::HashMap<&'static str, &'static str> =
         ("Download", "下载"),
         ("Upload folder", "上传文件夹"),
         ("Upload files", "上传文件"),
+        ("Clipboard is synchronized", "剪贴板已同步"),
     ].iter().cloned().collect();
 }

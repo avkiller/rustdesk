@@ -2038,6 +2038,8 @@ Future<bool> restoreWindowPosition(WindowType type,
   return false;
 }
 
+var webInitialLink = "";
+
 /// Initialize uni links for macos/windows
 ///
 /// [Availability]
@@ -2054,7 +2056,12 @@ Future<bool> initUniLinks() async {
     if (initialLink == null || initialLink.isEmpty) {
       return false;
     }
-    return handleUriLink(uriString: initialLink);
+    if (isWeb) {
+      webInitialLink = initialLink;
+      return false;
+    } else {
+      return handleUriLink(uriString: initialLink);
+    }
   } catch (err) {
     debugPrintStack(label: "$err");
     return false;
@@ -2067,7 +2074,7 @@ Future<bool> initUniLinks() async {
 ///
 /// Returns a [StreamSubscription] which can listen the uni links.
 StreamSubscription? listenUniLinks({handleByFlutter = true}) {
-  if (isLinux) {
+  if (isLinux || isWeb) {
     return null;
   }
 
@@ -2297,16 +2304,19 @@ connectMainDesktop(String id,
     required bool isRDP,
     bool? forceRelay,
     String? password,
+    String? connToken,
     bool? isSharedPassword}) async {
   if (isFileTransfer) {
     await rustDeskWinManager.newFileTransfer(id,
         password: password,
         isSharedPassword: isSharedPassword,
+        connToken: connToken,
         forceRelay: forceRelay);
   } else if (isTcpTunneling || isRDP) {
     await rustDeskWinManager.newPortForward(id, isRDP,
         password: password,
         isSharedPassword: isSharedPassword,
+        connToken: connToken,
         forceRelay: forceRelay);
   } else {
     await rustDeskWinManager.newRemoteDesktop(id,
@@ -2326,6 +2336,7 @@ connect(BuildContext context, String id,
     bool isRDP = false,
     bool forceRelay = false,
     String? password,
+    String? connToken,
     bool? isSharedPassword}) async {
   if (id == '') return;
   if (!isDesktop || desktopType == DesktopType.main) {
@@ -2367,6 +2378,7 @@ connect(BuildContext context, String id,
         'password': password,
         'isSharedPassword': isSharedPassword,
         'forceRelay': forceRelay,
+        'connToken': connToken,
       });
     }
   } else {
@@ -3177,6 +3189,9 @@ importConfig(List<TextEditingController>? controllers, List<RxString>? errMsgs,
   if (text != null && text.isNotEmpty) {
     try {
       final sc = ServerConfig.decode(text);
+      if (isWeb || isIOS) {
+        sc.relayServer = '';
+      }
       if (sc.idServer.isNotEmpty) {
         Future<bool> success = setServerConfig(controllers, errMsgs, sc);
         success.then((value) {

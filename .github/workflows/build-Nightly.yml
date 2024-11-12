@@ -1,5 +1,5 @@
 
-name: Nightly Build for fireworld
+name: Nightly Build Rustdesk for fireworld
 
 on:
   #schedule:

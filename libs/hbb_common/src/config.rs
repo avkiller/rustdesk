@@ -59,6 +59,20 @@ lazy_static::lazy_static! {
         Some(key) if !key.is_empty() => key,
         _ => "",
     }.to_owned());
+
+    pub static ref PROD_RENDEZVOUS_PORT: i32 = match option_env!("RENDEZVOUS_PORT") {
+    Some(key) if !key.is_empty() => match key.parse::<i32>()｛
+        Ok(value) => value,
+        _ => 21116
+        ｝
+    _ => 21116,
+    };
+
+
+    pub static ref PROD_RELAY_PORT: i32 = match option_env!("RELAY_PORT") {
+    Some(key) if !key.is_empty() => key.parse::<i32>()？,
+    _ => 21117,
+    };
     pub static ref EXE_RENDEZVOUS_SERVER: RwLock<String> = Default::default();
     pub static ref APP_NAME: RwLock<String> = RwLock::new("RustDesk".to_owned());
     static ref KEY_PAIR: Mutex<Option<KeyPair>> = Default::default();

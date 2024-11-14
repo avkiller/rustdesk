@@ -60,17 +60,13 @@ lazy_static::lazy_static! {
         _ => "",
     }.to_owned());
 
-    pub static ref PROD_RENDEZVOUS_PORT: i32 = match option_env!("RENDEZVOUS_PORT") {
-    Some(key) if !key.is_empty() => match key.parse::<i32>()｛
-        Ok(value) => value,
+    pub static ref PROD_RENDEZVOUS_PORT: RwLock<i32> = match option_env!("RENDEZVOUS_PORT") {
+        Some(key) if !key.is_empty() => key.parse::<i32>(),
         _ => 21116
-        ｝
-    _ => 21116,
     };
-
-
-    pub static ref PROD_RELAY_PORT: i32 = match option_env!("RELAY_PORT") {
-    Some(key) if !key.is_empty() => key.parse::<i32>()？,
+        
+    pub static ref PROD_RELAY_PORT: RwLock<i32> = match option_env!("RELAY_PORT") {
+    Some(key) if !key.is_empty() => key.parse::<i32>(),
     _ => 21117,
     };
     pub static ref EXE_RENDEZVOUS_SERVER: RwLock<String> = Default::default();

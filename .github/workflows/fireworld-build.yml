@@ -505,7 +505,7 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ inputs.upload-artifact }}
     steps:
-       - name: Download Artifacts
+      - name: Download Artifacts
         uses: actions/download-artifact@master
         with:
           name: rustdesk-unsigned-macos-aarch64

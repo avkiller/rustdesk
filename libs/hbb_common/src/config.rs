@@ -998,9 +998,11 @@ impl Config {
     }
 
     pub fn set_option(k: String, v: String) {
+        /*
         if !is_option_can_save(&OVERWRITE_SETTINGS, &k, &DEFAULT_SETTINGS, &v) {
             return;
         }
+        */
         let mut config = CONFIG2.write().unwrap();
         let v2 = if v.is_empty() { None } else { Some(&v) };
         if v2 != config.options.get(&k) {
@@ -1609,9 +1611,11 @@ impl LocalConfig {
     }
 
     pub fn set_option(k: String, v: String) {
+        /*
         if !is_option_can_save(&OVERWRITE_LOCAL_SETTINGS, &k, &DEFAULT_LOCAL_SETTINGS, &v) {
             return;
         }
+        */
         let mut config = LOCAL_CONFIG.write().unwrap();
         // The custom client will explictly set "default" as the default language.
         let is_custom_client_default_lang = k == keys::OPTION_LANGUAGE && v == "default";

@@ -1770,6 +1770,7 @@ impl UserDefaultConfig {
     }
 
     pub fn set(&mut self, key: String, value: String) {
+        /*
         if !is_option_can_save(
             &OVERWRITE_DISPLAY_SETTINGS,
             &key,
@@ -1778,6 +1779,7 @@ impl UserDefaultConfig {
         ) {
             return;
         }
+        */
         if value.is_empty() {
             self.options.remove(&key);
         } else {

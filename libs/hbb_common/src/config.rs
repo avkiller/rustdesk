@@ -974,7 +974,7 @@ impl Config {
     }
 
     pub fn set_options(mut v: HashMap<String, String>) {
-        Self::purify_options(&mut v);
+        //Self::purify_options(&mut v);
         let mut config = CONFIG2.write().unwrap();
         if config.options == v {
             return;

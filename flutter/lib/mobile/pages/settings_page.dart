@@ -1043,7 +1043,6 @@ class __DisplayPageState extends State<_DisplayPage> {
   SettingsTile otherRow(String label, String key) {
     final value = bind.mainGetUserDefaultOption(key: key) == 'Y';
     //final isOptFixed = isOptionFixed(key);
-    log::info!("Testing other row...");
     return SettingsTile.switchTile(
       initialValue: value,
       title: Text(translate(label)),

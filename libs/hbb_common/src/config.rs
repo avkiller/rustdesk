@@ -71,19 +71,6 @@ lazy_static::lazy_static! {
         .parse::<i32>()
         .expect("Failed to parse RELAY_PORT");
 
-    /*pub static ref RENDEZVOUS_PORT: RwLock<i32> = {
-        let port_str = option_env!("RENDEZVOUS_PORT").unwrap_or("");
-        let port_num = port_str.parse::<i32>().unwrap_or(21116);
-        RwLock::new(port_num)
-    };
-
-    pub static ref RELAY_PORT: RwLock<i32> = {
-        let port_str = option_env!("RELAY_PORT").unwrap_or("");
-        let port_num = port_str.parse::<i32>().unwrap_or(21117);
-        RwLock::new(port_num)
-    };
-    */
-
     pub static ref EXE_RENDEZVOUS_SERVER: RwLock<String> = Default::default();
     pub static ref APP_NAME: RwLock<String> = RwLock::new("RustDesk".to_owned());
     static ref KEY_PAIR: Mutex<Option<KeyPair>> = Default::default();

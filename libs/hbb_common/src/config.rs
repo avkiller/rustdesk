@@ -61,9 +61,9 @@ lazy_static::lazy_static! {
         _ => "",
     }.to_owned());
 
-    pub ref static GLOBAL_VAR: i32 = {
+    pub static ref RENDEZVOUS_PORT: i32 = {
         let default_value = 6789;
-        let env_value = env::var("test")
+        let env_value = env::var("RENDEZVOUS_PORT")
             .ok()
             .and_then(|val| val.parse().ok())
             .unwrap_or(default_value);
@@ -130,7 +130,7 @@ pub const RS_PUB_KEY: &str = match option_env!("RS_PUB_KEY") {
     _ => PUBLIC_RS_PUB_KEY,
 };
 
-pub const RENDEZVOUS_PORT: i32 = 10086;
+//pub const RENDEZVOUS_PORT: i32 = 10086;
 pub const RELAY_PORT: i32 = 10087;
 
 /*pub const RENDEZVOUS_PORT: i32 = match option_env!("RENDEZVOUS_PORT") {
@@ -775,7 +775,7 @@ impl Config {
         }
         if !rendezvous_server.contains(':') {
             //let port = RENDEZVOUS_PORT.read().unwrap(); // 获取读锁
-            rendezvous_server = format!("{rendezvous_server}:{RENDEZVOUS_PORT}");
+            rendezvous_server = format!("{rendezvous_server}:{*RENDEZVOUS_PORT}");
             
         }
         rendezvous_server

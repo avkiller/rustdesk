@@ -1435,6 +1435,8 @@ impl PeerConfig {
             // add option by fireworld
             keys::OPTION_SHOW_QUALITY_MONITOR,
             keys::OPTION_DISABLE_AUDIO,
+            keys::OPTION_DIRECT_SERVER,
+            keys::OPTION_ENABLE_CHECK_UPDATE,
         ]
         .map(|key| {
             mp.insert(key.to_owned(), UserDefaultConfig::read(key));
@@ -1776,6 +1778,7 @@ impl UserDefaultConfig {
             keys::OPTION_DISABLE_AUDIO => self.get_string(key, "Y", vec!["", "N"]),
             keys::OPTION_SHOW_QUALITY_MONITOR => self.get_string(key, "Y", vec!["", "N"]),
             keys::OPTION_DIRECT_SERVER => self.get_string(key, "Y", vec!["", "N"]),
+            keys::OPTION_ENABLE_CHECK_UPDATE => self.get_string(key, "N", vec!["", "Y"]),
             _ => self
                 .get_after(key)
                 .map(|v| v.to_string())

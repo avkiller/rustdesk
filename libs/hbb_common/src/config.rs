@@ -1,6 +1,7 @@
 use std::{
     collections::{HashMap, HashSet},
     fs,
+    env,
     io::{Read, Write},
     net::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr},
     ops::{Deref, DerefMut},
@@ -60,15 +61,15 @@ lazy_static::lazy_static! {
         _ => "",
     }.to_owned());
 
-    pub static RENDEZVOUS_PORT: i32 = match option_env!("RENDEZVOUS_PORT") {
-        Some(key) if !key.is_empty() => key.parse::<i32>().unwrap_or(21116),
-        _ => 21116,
-    };
+    pub static RENDEZVOUS_PORT: i32 = env::var("RENDEZVOUS_PORT")
+    .unwrap_or_else(|_| "21116".to_string())
+    .parse::<i32>()
+    .expect("Failed to parse RENDEZVOUS_PORT");
 
-    pub static RELAY_PORT: i32 = match option_env!("RELAY_PORT") {
-        Some(key) if !key.is_empty() => key.parse::<i32>().unwrap_or(21117),
-        _ => 21117,
-    };
+    pub static RELAY_PORT: i32 = env::var("RELAY_PORT")
+    .unwrap_or_else(|_| "21117".to_string())
+    .parse::<i32>()
+    .expect("Failed to parse RELAY_PORT");
 
     /*pub static ref RENDEZVOUS_PORT: RwLock<i32> = {
         let port_str = option_env!("RENDEZVOUS_PORT").unwrap_or("");

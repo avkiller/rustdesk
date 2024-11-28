@@ -774,7 +774,7 @@ impl Config {
                 .unwrap_or_default();
         }
         if !rendezvous_server.contains(':') {
-            let port = *RENDEZVOUS_PORT // 获取读锁
+            let port = *RENDEZVOUS_PORT; // 获取读锁
             rendezvous_server = format!("{rendezvous_server}:{port}");
             
         }

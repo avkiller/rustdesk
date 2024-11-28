@@ -55,7 +55,7 @@ lazy_static::lazy_static! {
     static ref LOCAL_CONFIG: RwLock<LocalConfig> = RwLock::new(LocalConfig::load());
     static ref TRUSTED_DEVICES: RwLock<(Vec<TrustedDevice>, bool)> = Default::default();
     static ref ONLINE: Mutex<HashMap<String, i64>> = Default::default();
-    pub static ref RENDEZVOUS_SERVER: RwLock<String> = RwLock::new(match option_env!("RENDEZVOUS_SERVER") {
+    pub static ref PROD_RENDEZVOUS_SERVER: RwLock<String> = RwLock::new(match option_env!("RENDEZVOUS_SERVER") {
         Some(key) if !key.is_empty() => key,
         _ => "",
     }.to_owned());
@@ -66,7 +66,7 @@ lazy_static::lazy_static! {
         RwLock::new(port_num)
     };
 
-    pub static ref PROD_RELAY_PORT: RwLock<i32> = {
+    pub static ref RELAY_PORT: RwLock<i32> = {
         let port_str = option_env!("RELAY_PORT").unwrap_or("");
         let port_num = port_str.parse::<i32>().unwrap_or(21117);
         RwLock::new(port_num)

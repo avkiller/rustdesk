@@ -60,7 +60,17 @@ lazy_static::lazy_static! {
         _ => "",
     }.to_owned());
 
-    pub static ref RENDEZVOUS_PORT: RwLock<i32> = {
+    pub static ref RENDEZVOUS_PORT: i32 = match option_env!("RENDEZVOUS_PORT") {
+        Some(key) if !key.is_empty() => key.parse::<i32>().unwrap_or(21116),
+        _ => 21116,
+    };
+
+    pub static ref RELAY_PORT: i32 = match option_env!("RELAY_PORT") {
+        Some(key) if !key.is_empty() => key.parse::<i32>().unwrap_or(21117),
+        _ => 21117,
+    };
+
+    /*pub static ref RENDEZVOUS_PORT: RwLock<i32> = {
         let port_str = option_env!("RENDEZVOUS_PORT").unwrap_or("");
         let port_num = port_str.parse::<i32>().unwrap_or(21116);
         RwLock::new(port_num)
@@ -71,6 +81,7 @@ lazy_static::lazy_static! {
         let port_num = port_str.parse::<i32>().unwrap_or(21117);
         RwLock::new(port_num)
     };
+    */
 
     pub static ref EXE_RENDEZVOUS_SERVER: RwLock<String> = Default::default();
     pub static ref APP_NAME: RwLock<String> = RwLock::new("RustDesk".to_owned());
@@ -765,8 +776,9 @@ impl Config {
                 .unwrap_or_default();
         }
         if !rendezvous_server.contains(':') {
-            let port = RENDEZVOUS_PORT.read().unwrap(); // 获取读锁
-            rendezvous_server = format!("{rendezvous_server}:{port}");
+            //let port = RENDEZVOUS_PORT.read().unwrap(); // 获取读锁
+            rendezvous_server = format!("{rendezvous_server}:{RENDEZVOUS_PORT}");
+            
         }
         rendezvous_server
     }

@@ -61,7 +61,7 @@ lazy_static::lazy_static! {
         _ => "",
     }.to_owned());
 
-    pub static GLOBAL_VAR: i32 = {
+    pub ref static GLOBAL_VAR: i32 = {
         let default_value = 6789;
         let env_value = env::var("test")
             .ok()

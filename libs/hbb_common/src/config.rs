@@ -62,14 +62,14 @@ lazy_static::lazy_static! {
     }.to_owned());
 
     pub static RENDEZVOUS_PORT: i32 = env::var("RENDEZVOUS_PORT")
-    .unwrap_or_else(|_| "21116".to_string())
-    .parse::<i32>()
-    .expect("Failed to parse RENDEZVOUS_PORT");
+        .unwrap_or_else(|_| "21116".to_string())
+        .parse::<i32>()
+        .expect("Failed to parse RENDEZVOUS_PORT");
 
     pub static RELAY_PORT: i32 = env::var("RELAY_PORT")
-    .unwrap_or_else(|_| "21117".to_string())
-    .parse::<i32>()
-    .expect("Failed to parse RELAY_PORT");
+        .unwrap_or_else(|_| "21117".to_string())
+        .parse::<i32>()
+        .expect("Failed to parse RELAY_PORT");
 
     /*pub static ref RENDEZVOUS_PORT: RwLock<i32> = {
         let port_str = option_env!("RENDEZVOUS_PORT").unwrap_or("");

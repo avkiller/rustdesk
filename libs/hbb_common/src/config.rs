@@ -765,7 +765,8 @@ impl Config {
                 .unwrap_or_default();
         }
         if !rendezvous_server.contains(':') {
-            rendezvous_server = format!("{rendezvous_server}:{RENDEZVOUS_PORT.read().unwrap()}");
+            let port = RENDEZVOUS_PORT.read().unwrap(); // 获取读锁
+            rendezvous_server = format!("{rendezvous_server}:{port}");
         }
         rendezvous_server
     }

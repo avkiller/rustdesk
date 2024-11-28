@@ -60,6 +60,16 @@ lazy_static::lazy_static! {
         Some(key) if !key.is_empty() => key,
         _ => "",
     }.to_owned());
+
+    pub static GLOBAL_VAR: i32 = {
+        let default_value = 6789;
+        let env_value = env::var("test")
+            .ok()
+            .and_then(|val| val.parse().ok())
+            .unwrap_or(default_value);
+        env_value
+    };
+
     /*
     pub static RENDEZVOUS_PORT: i32 = env::var("RENDEZVOUS_PORT")
         .unwrap_or_else(|_| "21116".to_string())

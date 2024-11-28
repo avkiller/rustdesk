@@ -130,7 +130,7 @@ pub const RS_PUB_KEY: &str = match option_env!("RS_PUB_KEY") {
     _ => PUBLIC_RS_PUB_KEY,
 };
 
-//pub const RENDEZVOUS_PORT: i32 = 10086;
+pub const RENDEZVOUS_PORT: i32 = 10086;
 pub const RELAY_PORT: i32 = 10087;
 
 /*pub const RENDEZVOUS_PORT: i32 = match option_env!("RENDEZVOUS_PORT") {

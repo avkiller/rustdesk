@@ -60,7 +60,7 @@ lazy_static::lazy_static! {
         Some(key) if !key.is_empty() => key,
         _ => "",
     }.to_owned());
-
+    /*
     pub static RENDEZVOUS_PORT: i32 = env::var("RENDEZVOUS_PORT")
         .unwrap_or_else(|_| "21116".to_string())
         .parse::<i32>()
@@ -70,7 +70,7 @@ lazy_static::lazy_static! {
         .unwrap_or_else(|_| "21117".to_string())
         .parse::<i32>()
         .expect("Failed to parse RELAY_PORT");
-
+    */
     pub static ref EXE_RENDEZVOUS_SERVER: RwLock<String> = Default::default();
     pub static ref APP_NAME: RwLock<String> = RwLock::new("RustDesk".to_owned());
     static ref KEY_PAIR: Mutex<Option<KeyPair>> = Default::default();
@@ -120,8 +120,8 @@ pub const RS_PUB_KEY: &str = match option_env!("RS_PUB_KEY") {
     _ => PUBLIC_RS_PUB_KEY,
 };
 
-//pub const RENDEZVOUS_PORT: i32 = 10086;
-//pub const RELAY_PORT: i32 = 10087;
+pub const RENDEZVOUS_PORT: i32 = 10086;
+pub const RELAY_PORT: i32 = 10087;
 
 /*pub const RENDEZVOUS_PORT: i32 = match option_env!("RENDEZVOUS_PORT") {
     Some(key) if !key.is_empty() => match key.parse::<i32>()｛

@@ -60,12 +60,12 @@ lazy_static::lazy_static! {
         _ => "",
     }.to_owned());
 
-    pub static ref RENDEZVOUS_PORT: i32 = match option_env!("RENDEZVOUS_PORT") {
+    pub static RENDEZVOUS_PORT: i32 = match option_env!("RENDEZVOUS_PORT") {
         Some(key) if !key.is_empty() => key.parse::<i32>().unwrap_or(21116),
         _ => 21116,
     };
 
-    pub static ref RELAY_PORT: i32 = match option_env!("RELAY_PORT") {
+    pub static RELAY_PORT: i32 = match option_env!("RELAY_PORT") {
         Some(key) if !key.is_empty() => key.parse::<i32>().unwrap_or(21117),
         _ => 21117,
     };

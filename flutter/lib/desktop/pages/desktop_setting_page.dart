@@ -50,10 +50,10 @@ class _TabInfo {
 enum SettingsTabKey {
   general,
   safety,
-  network,
+  // network,
   display,
   plugin,
-  account,
+  // account,
   about,
 }
 
@@ -1379,11 +1379,11 @@ class _NetworkState extends State<_Network> with AutomaticKeepAliveClientMixin {
     super.build(context);
     bool enabled = !locked;
     final scrollController = ScrollController();
-    final hideServer =
-        bind.mainGetBuildinOption(key: kOptionHideServerSetting) == 'Y';
+    final hideServer = true
+        // bind.mainGetBuildinOption(key: kOptionHideServerSetting) == 'Y';
     // TODO: support web proxy
-    final hideProxy =
-        isWeb || bind.mainGetBuildinOption(key: kOptionHideProxySetting) == 'Y';
+    final hideProxy = true
+        // isWeb || bind.mainGetBuildinOption(key: kOptionHideProxySetting) == 'Y';
     return DesktopScrollWrapper(
         scrollController: scrollController,
         child: ListView(
@@ -1397,7 +1397,8 @@ class _NetworkState extends State<_Network> with AutomaticKeepAliveClientMixin {
               AbsorbPointer(
                 absorbing: locked,
                 child: Column(children: [
-                  if (!hideServer) server(enabled),
+                  if (!hideServer) 
+                    server(enabled),
                   if (!hideProxy)
                     _Card(title: 'Proxy', children: [
                       _Button('Socks5/Http(s) Proxy', changeSocks5Proxy,

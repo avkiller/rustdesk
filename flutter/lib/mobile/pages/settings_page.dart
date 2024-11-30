@@ -75,9 +75,9 @@ class _SettingsState extends State<SettingsPage> with WidgetsBindingObserver {
   var _enableAbr = false;
   var _denyLANDiscovery = false;
   var _onlyWhiteList = false;
-  var _enableDirectIPAccess = false;
+  var _enableDirectIPAccess = true;
   var _enableRecordSession = false;
-  var _enableHardwareCodec = false;
+  var _enableHardwareCodec = true;
   var _autoRecordIncomingSession = false;
   var _autoRecordOutgoingSession = false;
   var _allowAutoDisconnect = false;
@@ -86,10 +86,10 @@ class _SettingsState extends State<SettingsPage> with WidgetsBindingObserver {
   var _fingerprint = "";
   var _buildDate = "";
   var _autoDisconnectTimeout = "";
-  var _hideServer = false;
-  var _hideProxy = false;
-  var _hideNetwork = false;
-  var _enableTrustedDevices = false;
+  var _hideServer = true;
+  var _hideProxy = true;
+  var _hideNetwork = true;
+  var _enableTrustedDevices = true;
 
   _SettingsState() {
     _enableAbr = option2bool(

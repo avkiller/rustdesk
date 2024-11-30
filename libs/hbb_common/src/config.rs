@@ -1781,8 +1781,6 @@ impl UserDefaultConfig {
             keys::OPTION_SHOW_QUALITY_MONITOR => self.get_string(key, "Y", vec!["", "N"]),
             keys::OPTION_DIRECT_SERVER => self.get_string(key, "Y", vec!["", "N"]),
             keys::OPTION_ENABLE_CHECK_UPDATE => self.get_string(key, "N", vec!["", "Y"]),
-            keys::OPTION_HIDE_SERVER_SETTINGS => self.get_string(key, "Y", vec!["", "N"]),
-            keys::OPTION_HIDE_PROXY_SETTINGS => self.get_string(key, "Y", vec!["", "N"]),
             _ => self
                 .get_after(key)
                 .map(|v| v.to_string())

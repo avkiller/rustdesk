@@ -1379,10 +1379,10 @@ class _NetworkState extends State<_Network> with AutomaticKeepAliveClientMixin {
     super.build(context);
     bool enabled = !locked;
     final scrollController = ScrollController();
-    final hideServer = true
+    final hideServer = true;
         // bind.mainGetBuildinOption(key: kOptionHideServerSetting) == 'Y';
     // TODO: support web proxy
-    final hideProxy = true
+    final hideProxy = true;
         // isWeb || bind.mainGetBuildinOption(key: kOptionHideProxySetting) == 'Y';
     return DesktopScrollWrapper(
         scrollController: scrollController,

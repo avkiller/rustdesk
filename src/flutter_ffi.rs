@@ -19,6 +19,7 @@ use hbb_common::allow_err;
 use hbb_common::{
     config::{self, LocalConfig, PeerConfig, PeerInfoSerde},
     fs, lazy_static, log,
+    message_proto::Hash,
     rendezvous_proto::ConnType,
     ResultType,
 };
@@ -1417,8 +1418,8 @@ pub fn main_get_last_remote_id() -> String {
 }
 
 pub fn main_get_software_update_url() {
-    if get_local_option("enable-check-update".to_string()) != "N" {
-        log::info!("check-update");
+    let opt = get_local_option(config::keys::OPTION_ENABLE_CHECK_UPDATE.to_string());
+    if config::option2bool(config::keys::OPTION_ENABLE_CHECK_UPDATE, &opt) {
         crate::common::check_software_update();
     }
 }
@@ -2340,6 +2341,25 @@ pub fn main_audio_support_loopback() -> SyncReturn<bool> {
     #[cfg(not(any(target_os = "windows", feature = "screencapturekit")))]
     let is_surpport = false;
     SyncReturn(is_surpport)
+}
+
+pub fn get_os_distro_info() -> SyncReturn<String> {
+    #[cfg(target_os = "linux")]
+    {
+        let distro = &hbb_common::platform::linux::DISTRO;
+        SyncReturn(
+            serde_json::to_string(&HashMap::from([
+                ("name", distro.name.clone()),
+                ("id", distro.id.clone()),
+                ("version_id", distro.version_id.clone()),
+            ]))
+            .unwrap_or_default(),
+        )
+    }
+    #[cfg(not(target_os = "linux"))]
+    {
+        SyncReturn("".to_owned())
+    }
 }
 
 #[cfg(target_os = "android")]

@@ -12,9 +12,9 @@ import 'package:flutter_hbb/consts.dart';
 import 'package:flutter_hbb/desktop/pages/connection_page.dart';
 import 'package:flutter_hbb/desktop/pages/desktop_setting_page.dart';
 import 'package:flutter_hbb/desktop/pages/desktop_tab_page.dart';
-import 'package:flutter_hbb/desktop/widgets/scroll_wrapper.dart';
 import 'package:flutter_hbb/models/platform_model.dart';
 import 'package:flutter_hbb/models/server_model.dart';
+import 'package:flutter_hbb/models/state_model.dart';
 import 'package:flutter_hbb/plugin/ui_manager.dart';
 import 'package:flutter_hbb/utils/multi_window_manager.dart';
 import 'package:get/get.dart';
@@ -40,7 +40,6 @@ class _DesktopHomePageState extends State<DesktopHomePage>
 
   @override
   bool get wantKeepAlive => true;
-  var updateUrl = '';
   var systemError = '';
   StreamSubscription? _uniLinksSubscription;
   var svcStopped = false.obs;
@@ -87,7 +86,8 @@ class _DesktopHomePageState extends State<DesktopHomePage>
       if (!isOutgoingOnly) buildIDBoard(context),
       if (!isOutgoingOnly) buildPasswordBoard(context),
       FutureBuilder<Widget>(
-        future: buildHelpCards(),
+        future: Future.value(
+            Obx(() => buildHelpCards(stateGlobal.updateUrl.value))),
         builder: (_, data) {
           if (data.hasData) {
             if (isIncomingOnly) {
@@ -125,47 +125,43 @@ class _DesktopHomePageState extends State<DesktopHomePage>
       child: Container(
         width: isIncomingOnly ? 280.0 : 200.0,
         color: Theme.of(context).colorScheme.background,
-        child: DesktopScrollWrapper(
-          scrollController: _leftPaneScrollController,
-          child: Stack(
-            children: [
-              SingleChildScrollView(
-                controller: _leftPaneScrollController,
-                physics: DraggableNeverScrollableScrollPhysics(),
-                child: Column(
-                  key: _childKey,
-                  children: children,
-                ),
+        child: Stack(
+          children: [
+            SingleChildScrollView(
+              controller: _leftPaneScrollController,
+              child: Column(
+                key: _childKey,
+                children: children,
               ),
-              if (isOutgoingOnly)
-                Positioned(
-                  bottom: 6,
-                  left: 12,
-                  child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: InkWell(
-                      child: Obx(
-                        () => Icon(
-                          Icons.settings,
-                          color: _editHover.value
-                              ? textColor
-                              : Colors.grey.withOpacity(0.5),
-                          size: 22,
-                        ),
+            ),
+            if (isOutgoingOnly)
+              Positioned(
+                bottom: 6,
+                left: 12,
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: InkWell(
+                    child: Obx(
+                      () => Icon(
+                        Icons.settings,
+                        color: _editHover.value
+                            ? textColor
+                            : Colors.grey.withOpacity(0.5),
+                        size: 22,
                       ),
-                      onTap: () => {
-                        if (DesktopSettingPage.tabKeys.isNotEmpty)
-                          {
-                            DesktopSettingPage.switch2page(
-                                DesktopSettingPage.tabKeys[0])
-                          }
-                      },
-                      onHover: (value) => _editHover.value = value,
                     ),
+                    onTap: () => {
+                      if (DesktopSettingPage.tabKeys.isNotEmpty)
+                        {
+                          DesktopSettingPage.switch2page(
+                              DesktopSettingPage.tabKeys[0])
+                        }
+                    },
+                    onHover: (value) => _editHover.value = value,
                   ),
-                )
-            ],
-          ),
+                ),
+              )
+          ],
         ),
       ),
     );
@@ -420,19 +416,19 @@ class _DesktopHomePageState extends State<DesktopHomePage>
     );
   }
 
-  Future<Widget> buildHelpCards() async {
-    // if (!bind.isCustomClient() &&
-    //     updateUrl.isNotEmpty &&
-    //     !isCardClosed &&
-    //     bind.mainUriPrefixSync().contains('rustdesk')) {
-    //   return buildInstallCard(
-    //       "Status",
-    //       "There is a newer version of ${bind.mainGetAppNameSync()} ${bind.mainGetNewVersion()} available.",
-    //       "Click to download", () async {
-    //     final Uri url = Uri.parse('https://rustdesk.com/download');
-    //     await launchUrl(url);
-    //   }, closeButton: true);
-    // }
+  Widget buildHelpCards(String updateUrl) {
+    if (!bind.isCustomClient() &&
+        updateUrl.isNotEmpty &&
+        !isCardClosed &&
+        bind.mainUriPrefixSync().contains('rustdesk')) {
+      return buildInstallCard(
+          "Status",
+          "There is a newer version of ${bind.mainGetAppNameSync()} ${bind.mainGetNewVersion()} available.",
+          "Click to download", () async {
+        final Uri url = Uri.parse('https://rustdesk.com/download');
+        await launchUrl(url);
+      }, closeButton: true);
+    }
     if (systemError.isNotEmpty) {
       return buildInstallCard("", systemError, "", () {});
     }
@@ -674,20 +670,6 @@ class _DesktopHomePageState extends State<DesktopHomePage>
   @override
   void initState() {
     super.initState();
-    if (!bind.isCustomClient()) {
-      platformFFI.registerEventHandler(
-          kCheckSoftwareUpdateFinish, kCheckSoftwareUpdateFinish,
-          (Map<String, dynamic> evt) async {
-        if (evt['url'] is String) {
-          setState(() {
-            updateUrl = evt['url'];
-          });
-        }
-      });
-      Timer(const Duration(seconds: 1), () async {
-        bind.mainGetSoftwareUpdateUrl();
-      });
-    }
     _updateTimer = periodic_immediate(const Duration(seconds: 1), () async {
       await gFFI.serverModel.fetchID();
       final error = await bind.mainGetError();

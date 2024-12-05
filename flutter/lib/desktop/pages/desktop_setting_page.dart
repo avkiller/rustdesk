@@ -1384,17 +1384,10 @@ class _NetworkState extends State<_Network> with AutomaticKeepAliveClientMixin {
   }
 
   Widget network(BuildContext context) {
-<<<<<<< HEAD
     final hideServer = true;
         // bind.mainGetBuildinOption(key: kOptionHideServerSetting) == 'Y';
     final hideProxy = true;
         // isWeb || bind.mainGetBuildinOption(key: kOptionHideProxySetting) == 'Y';
-=======
-    final hideServer =
-        bind.mainGetBuildinOption(key: kOptionHideServerSetting) == 'Y';
-    final hideProxy =
-        isWeb || bind.mainGetBuildinOption(key: kOptionHideProxySetting) == 'Y';
->>>>>>> a23822074ec5199c9fd462ffe5c9b1308601739c
 
     if (hideServer && hideProxy) {
       return Offstage();
@@ -1871,7 +1864,6 @@ class _AboutState extends State<_About> {
                 SelectionArea(
                     child: Text('${translate('Fingerprint')}: $fingerprint')
                         .marginSymmetric(vertical: 4.0)),
-<<<<<<< HEAD
               // InkWell(
               //     onTap: () {
               //       launchUrlString('https://rustdesk.com/privacy.html');
@@ -1888,24 +1880,6 @@ class _AboutState extends State<_About> {
               //       translate('Website'),
               //       style: linkStyle,
               //     ).marginSymmetric(vertical: 4.0)),
-=======
-              InkWell(
-                  onTap: () {
-                    launchUrlString('https://rustdesk.com/privacy.html');
-                  },
-                  child: Text(
-                    translate('Privacy Statement'),
-                    style: linkStyle,
-                  ).marginSymmetric(vertical: 4.0)),
-              InkWell(
-                  onTap: () {
-                    launchUrlString('https://rustdesk.com');
-                  },
-                  child: Text(
-                    translate('Website'),
-                    style: linkStyle,
-                  ).marginSymmetric(vertical: 4.0)),
->>>>>>> a23822074ec5199c9fd462ffe5c9b1308601739c
               Container(
                 decoration: const BoxDecoration(color: Color(0xFF2c8cff)),
                 padding:

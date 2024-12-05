@@ -782,11 +782,11 @@ class _SettingsState extends State<SettingsPage> with WidgetsBindingObserver {
           title: Text(translate("About")),
           tiles: [
             SettingsTile(
-                onPressed: (context) async {
-                  if (await canLaunchUrl(Uri.parse(url))) {
-                    await launchUrl(Uri.parse(url));
-                  }
-                },
+                // onPressed: (context) async {
+                //   if (await canLaunchUrl(Uri.parse(url))) {
+                //     await launchUrl(Uri.parse(url));
+                //   }
+                // },
                 title: Text(translate("Version: ") + version),
                 // value: Padding(
                 //   padding: EdgeInsets.symmetric(vertical: 8),

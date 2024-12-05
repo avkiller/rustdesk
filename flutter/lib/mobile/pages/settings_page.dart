@@ -5,6 +5,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_hbb/common/widgets/setting_widgets.dart';
 import 'package:flutter_hbb/desktop/pages/desktop_setting_page.dart';
+import 'package:flutter_hbb/models/state_model.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:settings_ui/settings_ui.dart';
@@ -70,6 +71,7 @@ class _SettingsState extends State<SettingsPage> with WidgetsBindingObserver {
       false; //androidVersion >= 26; // remove because not work on every device
   var _ignoreBatteryOpt = false;
   var _enableStartOnBoot = false;
+  var _checkUpdateOnStartup = false;
   var _floatingWindowDisabled = false;
   var _keepScreenOn = KeepScreenOn.duringControlled; // relay on floating window
   var _enableAbr = false;
@@ -89,7 +91,7 @@ class _SettingsState extends State<SettingsPage> with WidgetsBindingObserver {
   var _hideServer = true;
   var _hideProxy = true;
   var _hideNetwork = true;
-  var _enableTrustedDevices = true;
+  var _enableTrustedDevices = false;
 
   _SettingsState() {
     _enableAbr = option2bool(
@@ -152,6 +154,14 @@ class _SettingsState extends State<SettingsPage> with WidgetsBindingObserver {
       if (enableStartOnBoot != _enableStartOnBoot) {
         update = true;
         _enableStartOnBoot = enableStartOnBoot;
+      }
+
+      var checkUpdateOnStartup =
+          mainGetLocalBoolOptionSync(kOptionEnableCheckUpdate);
+      if (checkUpdateOnStartup != _checkUpdateOnStartup) {
+        update = true;
+        // _checkUpdateOnStartup = checkUpdateOnStartup;
+        _checkUpdateOnStartup = false;
       }
 
       var floatingWindowDisabled =
@@ -552,6 +562,22 @@ class _SettingsState extends State<SettingsPage> with WidgetsBindingObserver {
           gFFI.invokeMethod(AndroidChannel.kSetStartOnBootOpt, toValue);
         }));
 
+    // if (!bind.isCustomClient()) {
+    //   enhancementsTiles.add(
+    //     SettingsTile.switchTile(
+    //       initialValue: _checkUpdateOnStartup,
+    //       title:
+    //           Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+    //         Text(translate('Check for software update on startup')),
+    //       ]),
+    //       onToggle: (bool toValue) async {
+    //         await mainSetLocalBoolOption(kOptionEnableCheckUpdate, toValue);
+    //         setState(() => _checkUpdateOnStartup = toValue);
+    //       },
+    //     ),
+    //   );
+    // }
+
     onFloatingWindowChanged(bool toValue) async {
       if (toValue) {
         if (!await AndroidPermissionManager.check(kSystemAlertWindow)) {
@@ -762,13 +788,13 @@ class _SettingsState extends State<SettingsPage> with WidgetsBindingObserver {
                   }
                 },
                 title: Text(translate("Version: ") + version),
-                value: Padding(
-                  padding: EdgeInsets.symmetric(vertical: 8),
-                  child: Text('rustdesk.com',
-                      style: TextStyle(
-                        decoration: TextDecoration.underline,
-                      )),
-                ),
+                // value: Padding(
+                //   padding: EdgeInsets.symmetric(vertical: 8),
+                //   child: Text('rustdesk.com',
+                //       style: TextStyle(
+                //         decoration: TextDecoration.underline,
+                //       )),
+                // ),
                 leading: Icon(Icons.info)),
             SettingsTile(
                 title: Text(translate("Build Date")),
@@ -777,16 +803,15 @@ class _SettingsState extends State<SettingsPage> with WidgetsBindingObserver {
                   child: Text(_buildDate),
                 ),
                 leading: Icon(Icons.query_builder)),
-            if (isAndroid)
-              SettingsTile(
-                  onPressed: (context) => onCopyFingerprint(_fingerprint),
-                  title: Text(translate("Fingerprint")),
-                  value: Padding(
-                    padding: EdgeInsets.symmetric(vertical: 8),
-                    child: Text(_fingerprint),
-                  ),
-                  leading: Icon(Icons.fingerprint)),
-            //disable privacy
+            // if (isAndroid)
+            //   SettingsTile(
+            //       onPressed: (context) => onCopyFingerprint(_fingerprint),
+            //       title: Text(translate("Fingerprint")),
+            //       value: Padding(
+            //         padding: EdgeInsets.symmetric(vertical: 8),
+            //         child: Text(_fingerprint),
+            //       ),
+            //       leading: Icon(Icons.fingerprint)),
             // SettingsTile(
             //   title: Text(translate("Privacy Statement")),
             //   onPressed: (context) =>
@@ -827,11 +852,6 @@ class _SettingsState extends State<SettingsPage> with WidgetsBindingObserver {
       ],
     );
   }
-}
-
-void showServerSettings(OverlayDialogManager dialogManager) async {
-  Map<String, dynamic> options = jsonDecode(await bind.mainGetOptions());
-  showServerSettingsWithValue(ServerConfig.fromOptions(options), dialogManager);
 }
 
 void showLanguageSettings(OverlayDialogManager dialogManager) async {
@@ -1042,7 +1062,7 @@ class __DisplayPageState extends State<_DisplayPage> {
 
   SettingsTile otherRow(String label, String key) {
     final value = bind.mainGetUserDefaultOption(key: key) == 'Y';
-    //final isOptFixed = isOptionFixed(key);
+    // final isOptFixed = isOptionFixed(key);
     return SettingsTile.switchTile(
       initialValue: value,
       title: Text(translate(label)),

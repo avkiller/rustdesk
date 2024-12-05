@@ -73,7 +73,7 @@ class DesktopSettingPage extends StatefulWidget {
     if (!bind.isIncomingOnly()) SettingsTabKey.display,
     if (!isWeb && !bind.isIncomingOnly() && bind.pluginFeatureIsEnabled())
       SettingsTabKey.plugin,
-    if (!bind.isDisableAccount()) SettingsTabKey.account,
+    // if (!bind.isDisableAccount()) SettingsTabKey.account,
     SettingsTabKey.about,
   ];
 
@@ -152,10 +152,10 @@ class _DesktopSettingPageState extends State<DesktopSettingPage>
           settingTabs.add(_TabInfo(tab, 'Security',
               Icons.enhanced_encryption_outlined, Icons.enhanced_encryption));
           break;
-        // case SettingsTabKey.network:
-        //   settingTabs
-        //       .add(_TabInfo(tab, 'Network', Icons.link_outlined, Icons.link));
-        //   break;
+        case SettingsTabKey.network:
+           settingTabs
+               .add(_TabInfo(tab, 'Network', Icons.link_outlined, Icons.link));
+           break;
         case SettingsTabKey.display:
           settingTabs.add(_TabInfo(tab, 'Display',
               Icons.desktop_windows_outlined, Icons.desktop_windows));
@@ -164,10 +164,10 @@ class _DesktopSettingPageState extends State<DesktopSettingPage>
           settingTabs.add(_TabInfo(
               tab, 'Plugin', Icons.extension_outlined, Icons.extension));
           break;
-        // case SettingsTabKey.account:
-        //   settingTabs.add(
-        //       _TabInfo(tab, 'Account', Icons.person_outline, Icons.person));
-        //   break;
+         case SettingsTabKey.account:
+           settingTabs.add(
+               _TabInfo(tab, 'Account', Icons.person_outline, Icons.person));
+           break;
         case SettingsTabKey.about:
           settingTabs
               .add(_TabInfo(tab, 'About', Icons.info_outline, Icons.info));
@@ -187,18 +187,18 @@ class _DesktopSettingPageState extends State<DesktopSettingPage>
         case SettingsTabKey.safety:
           children.add(const _Safety());
           break;
-        // case SettingsTabKey.network:
-        //   children.add(const _Network());
-        //   break;
+        case SettingsTabKey.network:
+          children.add(const _Network());
+          break;
         case SettingsTabKey.display:
           children.add(const _Display());
           break;
         case SettingsTabKey.plugin:
           children.add(const _Plugin());
           break;
-        // case SettingsTabKey.account:
-        //   children.add(const _Account());
-        //   break;
+        case SettingsTabKey.account:
+          children.add(const _Account());
+          break;
         case SettingsTabKey.about:
           children.add(const _About());
           break;

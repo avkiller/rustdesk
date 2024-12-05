@@ -160,8 +160,12 @@ class _SettingsState extends State<SettingsPage> with WidgetsBindingObserver {
           mainGetLocalBoolOptionSync(kOptionEnableCheckUpdate);
       if (checkUpdateOnStartup != _checkUpdateOnStartup) {
         update = true;
+<<<<<<< HEAD
         // _checkUpdateOnStartup = checkUpdateOnStartup;
         _checkUpdateOnStartup = false;
+=======
+        _checkUpdateOnStartup = checkUpdateOnStartup;
+>>>>>>> a23822074ec5199c9fd462ffe5c9b1308601739c
       }
 
       var floatingWindowDisabled =
@@ -562,6 +566,7 @@ class _SettingsState extends State<SettingsPage> with WidgetsBindingObserver {
           gFFI.invokeMethod(AndroidChannel.kSetStartOnBootOpt, toValue);
         }));
 
+<<<<<<< HEAD
     // if (!bind.isCustomClient()) {
     //   enhancementsTiles.add(
     //     SettingsTile.switchTile(
@@ -577,6 +582,23 @@ class _SettingsState extends State<SettingsPage> with WidgetsBindingObserver {
     //     ),
     //   );
     // }
+=======
+    if (!bind.isCustomClient()) {
+      enhancementsTiles.add(
+        SettingsTile.switchTile(
+          initialValue: _checkUpdateOnStartup,
+          title:
+              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(translate('Check for software update on startup')),
+          ]),
+          onToggle: (bool toValue) async {
+            await mainSetLocalBoolOption(kOptionEnableCheckUpdate, toValue);
+            setState(() => _checkUpdateOnStartup = toValue);
+          },
+        ),
+      );
+    }
+>>>>>>> a23822074ec5199c9fd462ffe5c9b1308601739c
 
     onFloatingWindowChanged(bool toValue) async {
       if (toValue) {

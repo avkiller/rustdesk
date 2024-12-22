@@ -1,3 +1,5 @@
+#[cfg(not(any(target_os = "android", target_os = "ios")))]
+use crate::keyboard::input_source::{change_input_source, get_cur_session_input_source};
 use crate::{
     client::file_trait::FileManager,
     common::{make_fd_to_json, make_vec_fd_to_json},

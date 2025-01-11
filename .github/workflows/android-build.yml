@@ -1,4 +1,4 @@
-name: Base Build the RustDesk for fireworld
+name: Base Build the Android for fireworld
 
 on:
   workflow_call:

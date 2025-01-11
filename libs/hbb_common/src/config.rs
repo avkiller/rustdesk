@@ -28,9 +28,9 @@ use crate::{
     },
 };
 
-pub const RENDEZVOUS_TIMEOUT: u64 = 12_000;
-pub const CONNECT_TIMEOUT: u64 = 18_000;
-pub const READ_TIMEOUT: u64 = 18_000;
+pub const RENDEZVOUS_TIMEOUT: u64 = 30_000;
+pub const CONNECT_TIMEOUT: u64 = 31_000;
+pub const READ_TIMEOUT: u64 = 32_000;
 // https://github.com/quic-go/quic-go/issues/525#issuecomment-294531351
 // https://datatracker.ietf.org/doc/html/draft-hamilton-early-deployment-quic-00#section-6.10
 // 15 seconds is recommended by quic, though oneSIP recommend 25 seconds,

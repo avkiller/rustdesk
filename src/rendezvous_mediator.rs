@@ -154,7 +154,7 @@ impl RendezvousMediator {
 
         let mut timer = crate::rustdesk_interval(interval(crate::TIMER_OUT));
         const MIN_REG_TIMEOUT: i64 = 3_000;
-        const MAX_REG_TIMEOUT: i64 = 30_000;
+        const MAX_REG_TIMEOUT: i64 = 60_000;
         let mut reg_timeout = MIN_REG_TIMEOUT;
         const MAX_FAILS1: i64 = 2;
         const MAX_FAILS2: i64 = 4;
@@ -232,6 +232,7 @@ impl RendezvousMediator {
                                 if last_dns_check.elapsed().as_millis() as i64 > DNS_INTERVAL {
                                     // in some case of network reconnect (dial IP network),
                                     // old UDP socket not work any more after network recover
+                                    log::info!("dns check:");
                                     if let Some((s, new_addr)) = socket_client::rebind_udp_for(&rz.host).await? {
                                         socket = s;
                                         rz.addr = new_addr.clone();

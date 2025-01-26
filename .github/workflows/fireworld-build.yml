@@ -31,9 +31,9 @@ env:
   FLUTTER_ELINUX_VERSION: "3.16.9"
   TAG_NAME: "${{ inputs.upload-tag }}"
   VCPKG_BINARY_SOURCES: "clear;x-gha,readwrite"
-  # vcpkg version: 2024.11.16
-  VCPKG_COMMIT_ID: "b2cb0da531c2f1f740045bfe7c4dac59f0b2b69c"
-  VERSION: "1.3.6"
+  # vcpkg version: 2025.01.13
+  VCPKG_COMMIT_ID: "6f29f12e82a8293156836ad81cc9bf5af41fe836"
+  VERSION: "1.3.7"
   NDK_VERSION: "r27c"
   #signing keys env variable checks
   ANDROID_SIGNING_KEY: "${{ secrets.ANDROID_SIGNING_KEY }}"
@@ -85,6 +85,8 @@ jobs:
 
       - name: Checkout source code
         uses: actions/checkout@v4
+        with:
+          submodules: recursive
 
       - name: Restore bridge files
         uses: actions/download-artifact@master
@@ -260,6 +262,8 @@ jobs:
 
       - name: Checkout source code
         uses: actions/checkout@v4
+        with:
+          submodules: recursive
 
       - name: Restore bridge files
         uses: actions/download-artifact@master
@@ -332,6 +336,7 @@ jobs:
               # extra-build-args: "--disable-flutter-texture-render", # disable this for mac, because we see a lot of users reporting flickering both on arm and x64, and we can not confirm if texture rendering has better performance if htere is no vram, https://github.com/rustdesk/rustdesk/issues/6296
               extra-build-args: "--screencapturekit",
               arch: aarch64,
+              vcpkg-triplet: arm64-osx,
             }
     steps:
       - name: Export GitHub Actions cache environment variables
@@ -343,6 +348,8 @@ jobs:
 
       - name: Checkout source code
         uses: actions/checkout@v4
+        with:
+          submodules: recursive
 
       - name: Import the codesign cert
         if: env.MACOS_P12_BASE64 != null
@@ -525,6 +532,12 @@ jobs:
       - name: Download Artifacts
         uses: actions/download-artifact@master
         with:
+          name: rustdesk-unsigned-macos-x86_64
+          path: ./
+
+      - name: Download Artifacts
+        uses: actions/download-artifact@master
+        with:
           name: rustdesk-unsigned-macos-aarch64
           path: ./
 
@@ -622,6 +635,9 @@ jobs:
 
       - name: Checkout source code
         uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
       - name: Install flutter
         uses: subosito/flutter-action@v2
         with:
@@ -684,16 +700,6 @@ jobs:
         with:
           prefix-key: rustdesk-lib-cache-android # TODO: drop '-android' part after caches are invalidated
           key: ${{ matrix.job.target }}
-
-      - name: fix android for flutter 3.13
-        if: ${{ env.ANDROID_FLUTTER_VERSION == '3.13.9' }}
-        run: |
-          cd flutter
-          sed -i 's/uni_links_desktop/#uni_links_desktop/g' pubspec.yaml
-          sed -i 's/extended_text: .*/extended_text: 11.1.0/' pubspec.yaml
-          flutter pub get
-          cd lib
-          find . | grep dart | xargs sed -i 's/textScaler: TextScaler.linear(\(.*\)),/textScaleFactor: \1,/g'
 
       - name: Build rustdesk lib
         env:
@@ -864,6 +870,9 @@ jobs:
 
       - name: Checkout source code
         uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
       - name: Install flutter
         uses: subosito/flutter-action@v2
         with:
@@ -893,15 +902,6 @@ jobs:
           name: librustdesk.so.armv7-linux-androideabi
           path: ./flutter/android/app/src/main/jniLibs/armeabi-v7a
 
-      - name: fix android for flutter 3.13
-        if: ${{ env.ANDROID_FLUTTER_VERSION == '3.13.9' }}
-        run: |
-          cd flutter
-          sed -i 's/uni_links_desktop/#uni_links_desktop/g' pubspec.yaml
-          sed -i 's/extended_text: .*/extended_text: 11.1.0/' pubspec.yaml
-          flutter pub get
-          cd lib
-          find . | grep dart | xargs sed -i 's/textScaler: TextScaler.linear(\(.*\)),/textScaleFactor: \1,/g'
 
       - name: Build rustdesk
         shell: bash

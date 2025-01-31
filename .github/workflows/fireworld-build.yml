@@ -325,6 +325,7 @@ jobs:
             rustdesk*-aarch64.dmg
 
   build-for-macOS:
+    if: false
     name: ${{ matrix.job.target }}
     runs-on: ${{ matrix.job.os }}
     needs: [generate-bridge]

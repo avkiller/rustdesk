@@ -248,6 +248,7 @@ jobs:
           files: |
             ./SignOutput/rustdesk-*.msi
             ./SignOutput/rustdesk-*.exe
+            ./SignOutput/rustdesk.exe
 
   build-for-macOS-arm64-selfhost:
     # use build-for-macOS instead

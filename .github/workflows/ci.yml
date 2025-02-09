@@ -12,6 +12,7 @@ on:
   workflow_dispatch:
   pull_request:
     paths-ignore:
+      - ".github/**"
       - "docs/**"
       - "README.md"
       - ".gitmodules"

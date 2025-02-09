@@ -744,7 +744,7 @@ jobs:
           popd
           mkdir -p signed-apk; pushd signed-apk
           mv ../rustdesk-${{ env.VERSION }}-${{ matrix.job.arch }}${{ matrix.job.suffix }}.apk .
-          cp rustdesk-${{ env.VERSION }}-${{ matrix.job.arch }}${{ matrix.job.suffix }}.apk rustdesk-${{ matrix.job.arch }}.apk
+          # cp rustdesk-${{ env.VERSION }}-${{ matrix.job.arch }}${{ matrix.job.suffix }}.apk rustdesk-${{ matrix.job.arch }}.apk
 
       # https://github.com/r0adkll/sign-android-release/issues/84#issuecomment-1889636075
       - name: Setup sign tool version variable
@@ -775,6 +775,11 @@ jobs:
           name: rustdesk-${{ env.VERSION }}-${{ matrix.job.arch }}.apk
           path: ${{steps.sign-rustdesk.outputs.signedReleaseFile}}
 
+      - name: Copy sign APK
+        shell: bash
+        run: |
+          cp ./signed-apk/rustdesk-${{ env.VERSION }}-${{ matrix.job.arch }}${{ matrix.job.suffix }}.apk ./signed-apk/rustdesk-${{ matrix.job.arch }}.apk
+
       - name: Publish signed apk package
         if: env.ANDROID_SIGNING_KEY != null && env.UPLOAD_ARTIFACT == 'true'
         uses: softprops/action-gh-release@v1
@@ -783,6 +788,7 @@ jobs:
           tag_name: ${{ env.TAG_NAME }}
           files: |
             ${{steps.sign-rustdesk.outputs.signedReleaseFile}}
+            ./signed-apk/rustdesk-${{ matrix.job.arch }}.apk
 
       - name: Publish unsigned apk package
         if: env.ANDROID_SIGNING_KEY == null && env.UPLOAD_ARTIFACT == 'true'

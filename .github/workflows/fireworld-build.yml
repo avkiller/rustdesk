@@ -788,7 +788,7 @@ jobs:
           tag_name: ${{ env.TAG_NAME }}
           files: |
             ${{steps.sign-rustdesk.outputs.signedReleaseFile}}
-            ./signed-apk/rustdesk-${{ matrix.job.arch }}.apk
+            ./signed-apk/rustdesk-${{ matrix.job.arch }}-signed.apk
 
       - name: Publish unsigned apk package
         if: env.ANDROID_SIGNING_KEY == null && env.UPLOAD_ARTIFACT == 'true'

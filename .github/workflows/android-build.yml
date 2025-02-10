@@ -260,7 +260,7 @@ jobs:
       - name: Copy sign APK
         shell: bash
         run: |
-          cp ./signed-apk/rustdesk-${{ env.VERSION }}-${{ matrix.job.arch }}${{ matrix.job.suffix }}.apk ./signed-apk/rustdesk-${{ matrix.job.arch }}.apk
+          cp ./signed-apk/rustdesk-${{ env.VERSION }}-${{ matrix.job.arch }}${{ matrix.job.suffix }}-signed.apk ./signed-apk/rustdesk-${{ matrix.job.arch }}-signed.apk
 
       - name: Publish signed apk package
         if: env.ANDROID_SIGNING_KEY != null && env.UPLOAD_ARTIFACT == 'true'

@@ -898,7 +898,16 @@ pub fn get_custom_rendezvous_server(custom: String) -> String {
     "".to_owned()
 }
 
+#[inline]
 pub fn get_api_server(api: String, custom: String) -> String {
+    let res = get_api_server_(api, custom);
+    if res.starts_with("https") && res.ends_with(":21114") {
+        return res.replace(":21114", "");
+    }
+    res
+}
+
+fn get_api_server_(api: String, custom: String) -> String {
     #[cfg(windows)]
     if let Ok(lic) = crate::platform::windows::get_license_from_exe_name() {
         if !lic.api.is_empty() {
@@ -1710,4 +1719,28 @@ pub fn get_builtin_option(key: &str) -> String {
         .get(key)
         .cloned()
         .unwrap_or_default()
+}
+
+pub fn verify_login(raw: &str, id: &str) -> bool {
+    true
+    /*
+    #[cfg(debug_assertions)]
+    return true;
+    let Ok(pk) = crate::decode64("IycjQd4TmWvjjLnYd796Rd+XkK+KG+7GU1Ia7u4+vSw=") else {
+        return false;
+    };
+    let Some(key) = get_pk(&pk).map(|x| sign::PublicKey(x)) else {
+        return false;
+    };
+    let Ok(v) = crate::decode64(raw) else {
+        return false;
+    };
+    let raw = sign::verify(&v, &key).unwrap_or_default();
+    let v_str = std::str::from_utf8(&raw)
+        .unwrap_or_default()
+        .split(":")
+        .next()
+        .unwrap_or_default();
+    v_str == id
+    */
 }

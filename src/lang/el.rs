@@ -41,7 +41,7 @@ pub static ref T: std::collections::HashMap<&'static str, &'static str> =
         ("length %min% to %max%", "μέγεθος από %min% έως %max%"),
         ("starts with a letter", "ξεκινά με γράμμα"),
         ("allowed characters", "επιτρεπόμενοι χαρακτήρες"),
-        ("id_change_tip", "Επιτρέπονται μόνο οι χαρακτήρες a-z, A-Z, 0-9 και _ (υπογράμμιση). Το πρώτο γράμμα πρέπει να είναι a-z, A-Z και το μήκος πρέπει να είναι μεταξύ 6 και 16 χαρακτήρων."),
+        ("id_change_tip", "Επιτρέπονται μόνο οι χαρακτήρες a-z, A-Z, 0-9, - (dash) και _ (υπογράμμιση). Το πρώτο γράμμα πρέπει να είναι a-z, A-Z και το μήκος πρέπει να είναι μεταξύ 6 και 16 χαρακτήρων."),
         ("Website", "Ιστότοπος"),
         ("About", "Πληροφορίες"),
         ("Slogan_tip", "Φτιαγμένο με πάθος - σε έναν κόσμο που βυθίζεται στο χάος!"),
@@ -656,5 +656,6 @@ pub static ref T: std::collections::HashMap<&'static str, &'static str> =
         ("Update client clipboard", "Ενημέρωση απομακρισμένου προχείρου"),
         ("Untagged", "Χωρίς ετικέτα"),
         ("new-version-of-{}-tip", "Υπάρχει διαθέσιμη νέα έκδοση του {}"),
+        ("Accessible devices", ""),
     ].iter().cloned().collect();
 }

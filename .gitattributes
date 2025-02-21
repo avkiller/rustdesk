@@ -1,2 +1,2 @@
 * text=auto
-libs/hbb_common merge=ours
+libs/hbb_common/.git merge=ignore

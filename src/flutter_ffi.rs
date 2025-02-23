@@ -1101,55 +1101,76 @@ pub fn main_peer_exists(id: String) -> bool {
     peer_exists(&id)
 }
 
-pub fn main_load_recent_peers() {
-    if !config::APP_DIR.read().unwrap().is_empty() {
-        let peers: Vec<HashMap<&str, String>> = PeerConfig::peers(None)
-            .drain(..)
-            .map(|(id, _, p)| peer_to_map(id, p))
-            .collect();
+fn load_recent_peers(
+    vec_id_modified_time_path: &Vec<(String, SystemTime, std::path::PathBuf)>,
+    to_end: bool,
+    all_peers: &mut Vec<HashMap<&str, String>>,
+    from: usize,
+) -> usize {
+    let to = if to_end {
+        Some(vec_id_modified_time_path.len())
+    } else {
+        None
+    };
+    let mut peers_next = PeerConfig::batch_peers(vec_id_modified_time_path, from, to);
+    // There may be less peers than the batch size.
+    // But no need to consider this case, because it is a rare case.
+    let peers = peers_next.0.drain(..).map(|(id, _, p)| peer_to_map(id, p));
+    all_peers.extend(peers);
+    peers_next.1
+}
 
-        let data = HashMap::from([
-            ("name", "load_recent_peers".to_owned()),
-            (
-                "peers",
-                serde_json::ser::to_string(&peers).unwrap_or("".to_owned()),
-            ),
-        ]);
+pub fn main_load_recent_peers() {
+    let push_to_flutter = |peers, ids| {
+        let mut data = HashMap::from([("name", "load_recent_peers".to_owned()), ("peers", peers)]);
+        if let Some(ids) = ids {
+            data.insert("ids", ids);
+        }
         let _res = flutter::push_global_event(
             flutter::APP_TYPE_MAIN,
             serde_json::ser::to_string(&data).unwrap_or("".to_owned()),
         );
-    }
-}
+    };
 
-pub fn main_load_recent_peers_sync() -> SyncReturn<String> {
     if !config::APP_DIR.read().unwrap().is_empty() {
-        let peers: Vec<HashMap<&str, String>> = PeerConfig::peers(None)
-            .drain(..)
-            .map(|(id, _, p)| peer_to_map(id, p))
-            .collect();
+        let vec_id_modified_time_path = PeerConfig::get_vec_id_modified_time_path(&None);
+        if vec_id_modified_time_path.is_empty() {
+            push_to_flutter("".to_owned(), None);
+            return;
+        }
 
-        let data = HashMap::from([
-            ("name", "load_recent_peers".to_owned()),
-            (
-                "peers",
-                serde_json::ser::to_string(&peers).unwrap_or("".to_owned()),
-            ),
-        ]);
-        return SyncReturn(serde_json::ser::to_string(&data).unwrap_or("".to_owned()));
+        let load_two_times = vec_id_modified_time_path.len() > PeerConfig::BATCH_LOADING_COUNT
+            && cfg!(target_os = "windows");
+        let mut all_peers = vec![];
+        if load_two_times {
+            let next_from = load_recent_peers(&vec_id_modified_time_path, false, &mut all_peers, 0);
+            let rest_ids = if next_from < vec_id_modified_time_path.len() {
+                Some(
+                    vec_id_modified_time_path[next_from..]
+                        .iter()
+                        .map(|(id, _, _)| id.clone())
+                        .collect::<Vec<_>>()
+                        .join(", "),
+                )
+            } else {
+                None
+            };
+            push_to_flutter(
+                serde_json::ser::to_string(&all_peers).unwrap_or("".to_owned()),
+                rest_ids,
+            );
+            let _ = load_recent_peers(&vec_id_modified_time_path, true, &mut all_peers, next_from);
+        } else {
+            let _ = load_recent_peers(&vec_id_modified_time_path, true, &mut all_peers, 0);
+        }
+        // Don't check if `all_peers` is empty, because we need this message to update the state in the flutter side.
+        push_to_flutter(
+            serde_json::ser::to_string(&all_peers).unwrap_or("".to_owned()),
+            None,
+        );
+    } else {
+        push_to_flutter("".to_owned(), None)
     }
-    SyncReturn("".to_string())
-}
-
-pub fn main_load_lan_peers_sync() -> SyncReturn<String> {
-    let data = HashMap::from([
-        ("name", "load_lan_peers".to_owned()),
-        (
-            "peers",
-            serde_json::to_string(&get_lan_peers()).unwrap_or_default(),
-        ),
-    ]);
-    return SyncReturn(serde_json::ser::to_string(&data).unwrap_or("".to_owned()));
 }
 
 pub fn main_load_recent_peers_for_ab(filter: String) -> String {
@@ -1170,13 +1191,20 @@ pub fn main_load_recent_peers_for_ab(filter: String) -> String {
 }
 
 pub fn main_load_fav_peers() {
+    let push_to_flutter = |peers| {
+        let data = HashMap::from([("name", "load_fav_peers".to_owned()), ("peers", peers)]);
+        let _res = flutter::push_global_event(
+            flutter::APP_TYPE_MAIN,
+            serde_json::ser::to_string(&data).unwrap_or("".to_owned()),
+        );
+    };
     if !config::APP_DIR.read().unwrap().is_empty() {
         let favs = get_fav();
-        let mut recent = PeerConfig::peers(None);
+        let mut recent = PeerConfig::peers(Some(favs.clone()));
         let mut lan = config::LanPeers::load()
             .peers
             .iter()
-            .filter(|d| recent.iter().all(|r| r.0 != d.id))
+            .filter(|d| favs.contains(&d.id) && recent.iter().all(|r| r.0 != d.id))
             .map(|d| {
                 (
                     d.id.clone(),
@@ -1195,26 +1223,12 @@ pub fn main_load_fav_peers() {
         recent.append(&mut lan);
         let peers: Vec<HashMap<&str, String>> = recent
             .into_iter()
-            .filter_map(|(id, _, p)| {
-                if favs.contains(&id) {
-                    Some(peer_to_map(id, p))
-                } else {
-                    None
-                }
-            })
+            .map(|(id, _, p)| peer_to_map(id, p))
             .collect();
 
-        let data = HashMap::from([
-            ("name", "load_fav_peers".to_owned()),
-            (
-                "peers",
-                serde_json::ser::to_string(&peers).unwrap_or("".to_owned()),
-            ),
-        ]);
-        let _res = flutter::push_global_event(
-            flutter::APP_TYPE_MAIN,
-            serde_json::ser::to_string(&data).unwrap_or("".to_owned()),
-        );
+        push_to_flutter(serde_json::ser::to_string(&peers).unwrap_or("".to_owned()));
+    } else {
+        push_to_flutter("".to_owned());
     }
 }
 
@@ -1414,7 +1428,7 @@ pub fn main_get_last_remote_id() -> String {
 pub fn main_get_software_update_url() {
     let opt = get_local_option(config::keys::OPTION_ENABLE_CHECK_UPDATE.to_string());
     if config::option2bool(config::keys::OPTION_ENABLE_CHECK_UPDATE, &opt) {
-        // crate::common::check_software_update();
+        //crate::common::check_software_update();
     }
 }
 

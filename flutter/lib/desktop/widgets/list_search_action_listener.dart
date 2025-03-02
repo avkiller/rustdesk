@@ -46,7 +46,7 @@ class TimeoutStringBuffer {
   var _buffer = "";
   late DateTime _duration;
 
-  static int timeoutMilliSec = 1900;
+  static int timeoutMilliSec = 2000;
 
   String get buffer => _buffer;
 

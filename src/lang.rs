@@ -34,6 +34,7 @@ mod ptbr;
 mod ro;
 mod ru;
 mod sc;
+mod sc;
 mod sk;
 mod sl;
 mod sq;
@@ -123,6 +124,7 @@ pub fn translate_locale(name: String, locale: &str) -> String {
         "be" => be::T.deref(),
         "he" => he::T.deref(),
         "hr" => hr::T.deref(),
+        "sc" => sc::T.deref(),
         _ => en::T.deref(),
     };
     let (name, placeholder_value) = extract_placeholder(&name);

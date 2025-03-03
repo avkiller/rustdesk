@@ -34,7 +34,6 @@ mod ptbr;
 mod ro;
 mod ru;
 mod sc;
-mod sc;
 mod sk;
 mod sl;
 mod sq;

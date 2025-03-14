@@ -44,6 +44,7 @@ mod tr;
 mod tw;
 mod uk;
 mod vn;
+mod ta;
 
 pub const LANGS: &[(&str, &str)] = &[
     ("en", "English"),
@@ -124,6 +125,7 @@ pub fn translate_locale(name: String, locale: &str) -> String {
         "he" => he::T.deref(),
         "hr" => hr::T.deref(),
         "sc" => sc::T.deref(),
+        "ta" => ta::T.deref(),
         _ => en::T.deref(),
     };
     let (name, placeholder_value) = extract_placeholder(&name);

@@ -92,16 +92,28 @@ pub fn host_stop_system_key_propagate(_stopped: bool) {
 }
 
 // This function is only used to count the number of control sessions.
-pub fn peer_get_default_sessions_count(id: String) -> SyncReturn<usize> {
-    SyncReturn(sessions::get_session_count(id, ConnType::DEFAULT_CONN))
+pub fn peer_get_sessions_count(id: String, conn_type: i32) -> SyncReturn<usize> {
+    let conn_type = if conn_type == ConnType::VIEW_CAMERA as i32 {
+        ConnType::VIEW_CAMERA
+    } else if conn_type == ConnType::FILE_TRANSFER as i32 {
+        ConnType::FILE_TRANSFER
+    } else if conn_type == ConnType::PORT_FORWARD as i32 {
+        ConnType::PORT_FORWARD
+    } else if conn_type == ConnType::RDP as i32 {
+        ConnType::RDP
+    } else {
+        ConnType::DEFAULT_CONN
+    };
+    SyncReturn(sessions::get_session_count(id, conn_type))
 }
 
 pub fn session_add_existed_sync(
     id: String,
     session_id: SessionID,
     displays: Vec<i32>,
+    is_view_camera: bool,
 ) -> SyncReturn<String> {
-    if let Err(e) = session_add_existed(id.clone(), session_id, displays) {
+    if let Err(e) = session_add_existed(id.clone(), session_id, displays, is_view_camera) {
         SyncReturn(format!("Failed to add session with id {}, {}", &id, e))
     } else {
         SyncReturn("".to_owned())
@@ -112,6 +124,7 @@ pub fn session_add_sync(
     session_id: SessionID,
     id: String,
     is_file_transfer: bool,
+    is_view_camera: bool,
     is_port_forward: bool,
     is_rdp: bool,
     switch_uuid: String,
@@ -124,6 +137,7 @@ pub fn session_add_sync(
         &session_id,
         &id,
         is_file_transfer,
+        is_view_camera,
         is_port_forward,
         is_rdp,
         &switch_uuid,
@@ -979,6 +993,7 @@ pub fn main_get_env(key: String) -> SyncReturn<String> {
 
 pub fn main_set_local_option(key: String, value: String) {
     let is_texture_render_key = key.eq(config::keys::OPTION_TEXTURE_RENDER);
+    let is_d3d_render_key = key.eq(config::keys::OPTION_ALLOW_D3D_RENDER);
     set_local_option(key, value.clone());
     if is_texture_render_key {
         let session_event = [("v", &value)];
@@ -986,6 +1001,11 @@ pub fn main_set_local_option(key: String, value: String) {
             session.push_event("use_texture_render", &session_event, &[]);
             session.use_texture_render_changed();
             session.ui_handler.update_use_texture_render();
+        }
+    }
+    if is_d3d_render_key {
+        for session in sessions::get_sessions() {
+            session.update_supported_decodings();
         }
     }
 }
@@ -1636,7 +1656,7 @@ pub fn session_alternative_codecs(session_id: SessionID) -> String {
 
 pub fn session_change_prefer_codec(session_id: SessionID) {
     if let Some(session) = sessions::get_session_by_session_id(&session_id) {
-        session.change_prefer_codec();
+        session.update_supported_decodings();
     }
 }
 

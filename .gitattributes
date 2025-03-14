@@ -1,3 +1,3 @@
 * text=auto
-libs/hbb_common/.git merge=ignore
+libs/hbb_common/** merge=ignore
 README.md merge=ignore

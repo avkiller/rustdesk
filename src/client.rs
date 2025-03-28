@@ -49,6 +49,7 @@ use hbb_common::{
         self, Config, LocalConfig, PeerConfig, PeerInfoSerde, Resolution, CONNECT_TIMEOUT,
         PUBLIC_RS_PUB_KEY, READ_TIMEOUT, RELAY_PORT, RENDEZVOUS_PORT, RENDEZVOUS_SERVERS,
     },
+    fs::JobType,
     get_version_number, log,
     message_proto::{option_message::BoolOption, *},
     protobuf::{Message as _, MessageField},

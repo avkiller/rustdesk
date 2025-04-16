@@ -1,4 +1,4 @@
 * text=auto
-libs/hbb_common/** merge=ignore
+# libs/hbb_common/** merge=ignore
 README.md merge=ignore
 src/lang.rs merge=ignore

@@ -25,8 +25,10 @@ jobs:
           git subtree pull --prefix=libs/hbb_common https://github.com/avkiller/hbb_common.git main --squash --message="updatelib"
           # git submodule update --init --recursive
           # git submodule update --recursive --remote
-          git status
+          
+          git add libs/hbb_common
           git add .
+          git status
           git commit -m "Update submodules"
           git push
 

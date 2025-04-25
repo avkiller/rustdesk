@@ -22,11 +22,15 @@ jobs:
         run: |
           git config --global user.email "avkiller2012@gmail.com"
           git config --global user.name "avkiller"
-          git subtree pull --prefix=libs/hbb_common https://github.com/avkiller/hbb_common.git main --squash --message="updatelib"
+          # git subtree pull --prefix=libs/hbb_common https://github.com/avkiller/hbb_common.git main --squash --message="updatelib"
           # git submodule update --init --recursive
           # git submodule update --recursive --remote
-          
-          git add libs/hbb_common
+          # 备份当前修改（如有）
+          git checkout master
+          git rm -r libs/hbb_common
+          git commit -m "Remove subtree to reset history"
+          git subtree add --prefix=libs/hbb_common https://github.com/avkiller/hbb_common.git main --squash
+          # git add libs/hbb_common
           git add .
           git status
           git commit -m "Update submodules"

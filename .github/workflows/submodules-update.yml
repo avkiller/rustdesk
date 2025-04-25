@@ -22,6 +22,7 @@ jobs:
         run: |
           git config --global user.email "avkiller2012@gmail.com"
           git config --global user.name "avkiller"
+          git status
           git subtree pull --prefix=libs/hbb_common https://github.com/avkiller/hbb_common.git main --squash --message="updatelib"
           # git submodule update --init --recursive
           # git submodule update --recursive --remote

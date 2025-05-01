@@ -32,7 +32,7 @@ jobs:
           # git subtree add --prefix=libs/hbb_common https://github.com/avkiller/hbb_common.git main --squash
           # git add libs/hbb_common
           git add .
+          git commit --no-verify -m "Update submodules"
           git status
-          git commit -m "Update submodules"
           git push origin master
 

@@ -41,7 +41,7 @@ pub trait Reset {
 pub struct ServiceTmpl<T: Subscriber + From<ConnInner>>(Arc<RwLock<ServiceInner<T>>>);
 pub struct ServiceSwap<T: Subscriber + From<ConnInner>>(ServiceTmpl<T>);
 pub type GenericService = ServiceTmpl<ConnInner>;
-pub const HIBERNATE_TIMEOUT: u64 = 60;
+pub const HIBERNATE_TIMEOUT: u64 = 30;
 pub const MAX_ERROR_TIMEOUT: u64 = 1_000;
 pub const SERVICE_OPTION_VALUE_TRUE: &str = "1";
 pub const SERVICE_OPTION_VALUE_FALSE: &str = "0";

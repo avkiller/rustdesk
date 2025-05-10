@@ -695,11 +695,17 @@ pub static ref T: std::collections::HashMap<&'static str, &'static str> =
         ("Auto update", "Automatyczna aktualizacja"),
         ("update-failed-check-msi-tip", "Sprawdzenie metody instalacji nie powiodło się. Kliknij przycisk \"Pobierz\", aby pobrać ze strony wydania i uaktualnić ręcznie."),
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> fb1661c8974db1103c4157069338fbb60db56f2f
         ("websocket_tip", ""),
         ("Use WebSocket", ""),
         ("Trackpad speed", ""),
         ("Default trackpad speed", ""),
+<<<<<<< HEAD
 =======
 >>>>>>> f8c8710920ad9ef71fc152aa134c02d734e19ba1
+=======
+>>>>>>> fb1661c8974db1103c4157069338fbb60db56f2f
     ].iter().cloned().collect();
 }

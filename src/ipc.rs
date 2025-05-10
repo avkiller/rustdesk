@@ -1,5 +1,6 @@
 use crate::{
     common::CheckTestNatType,
+    common::CheckTestNatType,
     privacy_mode::PrivacyModeState,
     ui_interface::{get_local_option, set_local_option},
 };
@@ -23,6 +24,7 @@ pub use clipboard::ClipboardFile;
 use hbb_common::{
     allow_err, bail, bytes,
     bytes_codec::BytesCodec,
+    config::{self, keys::OPTION_ALLOW_WEBSOCKET, Config, Config2},
     config::{self, keys::OPTION_ALLOW_WEBSOCKET, Config, Config2},
     futures::StreamExt as _,
     futures_util::sink::SinkExt,
@@ -350,9 +352,25 @@ pub struct CheckIfRestart {
     ws: String,
     api_server: String,
 }
+pub struct CheckIfRestart {
+    stop_service: String,
+    rendezvous_servers: Vec<String>,
+    audio_input: String,
+    voice_call_input: String,
+    ws: String,
+    api_server: String,
+}
 
 impl CheckIfRestart {
     pub fn new() -> CheckIfRestart {
+        CheckIfRestart {
+            stop_service: Config::get_option("stop-service"),
+            rendezvous_servers: Config::get_rendezvous_servers(),
+            audio_input: Config::get_option("audio-input"),
+            voice_call_input: Config::get_option("voice-call-input"),
+            ws: Config::get_option(OPTION_ALLOW_WEBSOCKET),
+            api_server: Config::get_option("api-server"),
+        }
         CheckIfRestart {
             stop_service: Config::get_option("stop-service"),
             rendezvous_servers: Config::get_rendezvous_servers(),
@@ -369,12 +387,18 @@ impl Drop for CheckIfRestart {
             || self.rendezvous_servers != Config::get_rendezvous_servers()
             || self.ws != Config::get_option(OPTION_ALLOW_WEBSOCKET)
             || self.api_server != Config::get_option("api-server")
+        if self.stop_service != Config::get_option("stop-service")
+            || self.rendezvous_servers != Config::get_rendezvous_servers()
+            || self.ws != Config::get_option(OPTION_ALLOW_WEBSOCKET)
+            || self.api_server != Config::get_option("api-server")
         {
             RendezvousMediator::restart();
         }
         if self.audio_input != Config::get_option("audio-input") {
+        if self.audio_input != Config::get_option("audio-input") {
             crate::audio_service::restart();
         }
+        if self.voice_call_input != Config::get_option("voice-call-input") {
         if self.voice_call_input != Config::get_option("voice-call-input") {
             crate::audio_service::set_voice_call_input_device(
                 Some(Config::get_option("voice-call-input")),
@@ -461,6 +485,7 @@ async fn handle(data: Data, stream: &mut Connection) {
             }
             Some(data) => {
                 let _nat = CheckTestNatType::new();
+                let _nat = CheckTestNatType::new();
                 if data.proxy.is_empty() {
                     Config::set_socks(None);
                 } else {
@@ -469,6 +494,19 @@ async fn handle(data: Data, stream: &mut Connection) {
                 RendezvousMediator::restart();
                 log::info!("socks updated");
             }
+        },
+        Data::SocksWs(s) => match s {
+            None => {
+                allow_err!(
+                    stream
+                        .send(&Data::SocksWs(Some(Box::new((
+                            Config::get_socks(),
+                            Config::get_option(OPTION_ALLOW_WEBSOCKET)
+                        )))))
+                        .await
+                );
+            }
+            _ => {}
         },
         Data::SocksWs(s) => match s {
             None => {
@@ -521,6 +559,8 @@ async fn handle(data: Data, stream: &mut Connection) {
                 } else if name == "hide_cm" {
                     value = if crate::hbbs_http::sync::is_pro() || crate::common::is_custom_client()
                     {
+                    value = if crate::hbbs_http::sync::is_pro() || crate::common::is_custom_client()
+                    {
                         Some(hbb_common::password_security::hide_cm().to_string())
                     } else {
                         None
@@ -563,6 +603,7 @@ async fn handle(data: Data, stream: &mut Connection) {
             }
             Some(value) => {
                 let _chk = CheckIfRestart::new();
+                let _nat = CheckTestNatType::new();
                 let _nat = CheckTestNatType::new();
                 if let Some(v) = value.get("privacy-mode-impl-key") {
                     crate::privacy_mode::switch(v);
@@ -712,6 +753,25 @@ async fn handle(data: Data, stream: &mut Connection) {
             None => {
                 // `None` is usually used to get values.
                 // This branch is left blank for unification and further use.
+            }
+        },
+        #[cfg(target_os = "windows")]
+        Data::PortForwardSessionCount(c) => match c {
+            None => {
+                let count = crate::server::AUTHED_CONNS
+                    .lock()
+                    .unwrap()
+                    .iter()
+                    .filter(|c| c.conn_type == crate::server::AuthConnType::PortForward)
+                    .count();
+                allow_err!(
+                    stream
+                        .send(&Data::PortForwardSessionCount(Some(count)))
+                        .await
+                );
+            }
+            _ => {
+                // Port forward session count is only a get value.
             }
         },
         #[cfg(target_os = "windows")]
@@ -1134,6 +1194,7 @@ pub fn set_option(key: &str, value: &str) {
 #[tokio::main(flavor = "current_thread")]
 pub async fn set_options(value: HashMap<String, String>) -> ResultType<()> {
     let _nat = CheckTestNatType::new();
+    let _nat = CheckTestNatType::new();
     if let Ok(mut c) = connect(1000, "").await {
         c.send(&Data::Options(Some(value.clone()))).await?;
         // do not put below before connect, because we need to check should_exit
@@ -1192,6 +1253,7 @@ pub async fn get_socks() -> Option<config::Socks5Server> {
 #[tokio::main(flavor = "current_thread")]
 pub async fn set_socks(value: config::Socks5Server) -> ResultType<()> {
     let _nat = CheckTestNatType::new();
+    let _nat = CheckTestNatType::new();
     Config::set_socks(if value.proxy.is_empty() {
         None
     } else {
@@ -1202,6 +1264,29 @@ pub async fn set_socks(value: config::Socks5Server) -> ResultType<()> {
         .send(&Data::Socks(Some(value)))
         .await?;
     Ok(())
+}
+
+async fn get_socks_ws_(ms_timeout: u64) -> ResultType<(Option<config::Socks5Server>, String)> {
+    let mut c = connect(ms_timeout, "").await?;
+    c.send(&Data::SocksWs(None)).await?;
+    if let Some(Data::SocksWs(Some(value))) = c.next_timeout(ms_timeout).await? {
+        Config::set_socks(value.0.clone());
+        Config::set_option(OPTION_ALLOW_WEBSOCKET.to_string(), value.1.clone());
+        Ok(*value)
+    } else {
+        Ok((
+            Config::get_socks(),
+            Config::get_option(OPTION_ALLOW_WEBSOCKET),
+        ))
+    }
+}
+
+#[tokio::main(flavor = "current_thread")]
+pub async fn get_socks_ws() -> (Option<config::Socks5Server>, String) {
+    get_socks_ws_(1_000).await.unwrap_or((
+        Config::get_socks(),
+        Config::get_option(OPTION_ALLOW_WEBSOCKET),
+    ))
 }
 
 async fn get_socks_ws_(ms_timeout: u64) -> ResultType<(Option<config::Socks5Server>, String)> {
@@ -1265,6 +1350,16 @@ pub async fn connect_to_user_session(usid: Option<u32>) -> ResultType<()> {
 pub async fn notify_server_to_check_hwcodec() -> ResultType<()> {
     connect(1_000, "").await?.send(&&Data::CheckHwcodec).await?;
     Ok(())
+}
+
+#[cfg(target_os = "windows")]
+pub async fn get_port_forward_session_count(ms_timeout: u64) -> ResultType<usize> {
+    let mut c = connect(ms_timeout, "").await?;
+    c.send(&Data::PortForwardSessionCount(None)).await?;
+    if let Some(Data::PortForwardSessionCount(Some(count))) = c.next_timeout(ms_timeout).await? {
+        return Ok(count);
+    }
+    bail!("Failed to get port forward session count");
 }
 
 #[cfg(target_os = "windows")]

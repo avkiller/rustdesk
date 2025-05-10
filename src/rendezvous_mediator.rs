@@ -15,6 +15,9 @@ use hbb_common::{
     config::{
         self, keys::*, option2bool, use_ws, Config, CONNECT_TIMEOUT, REG_INTERVAL, RENDEZVOUS_PORT,
     },
+    config::{
+        self, keys::*, option2bool, use_ws, Config, CONNECT_TIMEOUT, REG_INTERVAL, RENDEZVOUS_PORT,
+    },
     futures::future::join_all,
     log,
     protobuf::Message as _,
@@ -73,6 +76,7 @@ impl RendezvousMediator {
 >>>>>>> f8c8710920ad9ef71fc152aa134c02d734e19ba1
         check_zombie();
         let server = new_server();
+        crate::test_nat_type();
         crate::test_nat_type();
         if config::option2bool("stop-service", &Config::get_option("stop-service")) {
             crate::test_rendezvous_server();
@@ -145,6 +149,7 @@ impl RendezvousMediator {
 
     pub async fn start_udp(server: ServerPtr, host: String) -> ResultType<()> {
         let host = check_port(&host, RENDEZVOUS_PORT);
+        log::info!("start udp: {host}");
         log::info!("start udp: {host}");
         let (mut socket, mut addr) = socket_client::new_udp_for(&host, CONNECT_TIMEOUT).await?;
         let mut rz = Self {
@@ -331,6 +336,7 @@ impl RendezvousMediator {
     pub async fn start_tcp(server: ServerPtr, host: String) -> ResultType<()> {
         let host = check_port(&host, RENDEZVOUS_PORT);
         log::info!("start tcp: {}", hbb_common::websocket::check_ws(&host));
+        log::info!("start tcp: {}", hbb_common::websocket::check_ws(&host));
         let mut conn = connect_tcp(host.clone(), CONNECT_TIMEOUT).await?;
         let key = crate::get_key(true).await;
         crate::secure_tcp(&mut conn, &key).await?;
@@ -345,6 +351,7 @@ impl RendezvousMediator {
         let mut last_recv_msg = Instant::now();
         // we won't support connecting to multiple rendzvous servers any more, so we can use a global variable here.
         Config::set_host_key_confirmed(&rz.host_prefix, false);
+        Config::set_host_key_confirmed(&rz.host_prefix, false);
         loop {
             let mut update_latency = || {
                 let latency = last_register_sent
@@ -358,6 +365,8 @@ impl RendezvousMediator {
                     last_recv_msg = Instant::now();
                     let bytes = res.ok_or_else(|| anyhow::anyhow!("Rendezvous connection is reset by the peer"))??;
                     if bytes.is_empty() {
+                        // After fixing frequent register_pk, for websocket, nginx need to set proxy_read_timeout to more than 60 seconds, eg: 120s
+                        // https://serverfault.com/questions/1060525/why-is-my-websocket-connection-gets-closed-in-60-seconds
                         // After fixing frequent register_pk, for websocket, nginx need to set proxy_read_timeout to more than 60 seconds, eg: 120s
                         // https://serverfault.com/questions/1060525/why-is-my-websocket-connection-gets-closed-in-60-seconds
                         conn.send_bytes(bytes::Bytes::new()).await?;
@@ -376,6 +385,7 @@ impl RendezvousMediator {
                     }
                     if (!Config::get_key_confirmed() ||
                         !Config::get_host_key_confirmed(&rz.host_prefix)) &&
+                        !Config::get_host_key_confirmed(&rz.host_prefix)) &&
                         last_register_sent.map(|x| x.elapsed().as_millis() as i64).unwrap_or(REG_INTERVAL) >= REG_INTERVAL {
                         rz.register_pk(Sink::Stream(&mut conn)).await?;
                         last_register_sent = Some(Instant::now());
@@ -390,6 +400,8 @@ impl RendezvousMediator {
         log::info!("start rendezvous mediator of {}", host);
         //If the investment agent type is http or https, then tcp forwarding is enabled.
         if (cfg!(debug_assertions) && option_env!("TEST_TCP").is_some())
+            || Config::is_proxy()
+            || use_ws()
             || Config::is_proxy()
             || use_ws()
             || get_builtin_option(config::keys::OPTION_DISABLE_UDP) == "Y"
@@ -466,6 +478,12 @@ impl RendezvousMediator {
             && !Config::is_proxy()
             && !use_ws()
         {
+        // websocket, go relay directly
+        if is_ipv4(&self.addr)
+            && !config::is_disable_tcp_listen()
+            && !Config::is_proxy()
+            && !use_ws()
+        {
             if let Err(err) = self
                 .handle_intranet_(fla.clone(), server.clone(), relay_server.clone())
                 .await
@@ -518,9 +536,12 @@ impl RendezvousMediator {
     async fn handle_punch_hole(&self, ph: PunchHole, server: ServerPtr) -> ResultType<()> {
         let relay_server = self.get_relay_server(ph.relay_server);
         // for ensure, websocket go relay directly
+        // for ensure, websocket go relay directly
         if ph.nat_type.enum_value() == Ok(NatType::SYMMETRIC)
             || Config::get_nat_type() == NatType::SYMMETRIC as i32
             || config::is_disable_tcp_listen()
+            || use_ws()
+            || Config::is_proxy()
             || use_ws()
             || Config::is_proxy()
         {

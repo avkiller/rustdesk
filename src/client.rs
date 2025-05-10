@@ -218,6 +218,8 @@ impl Client {
                 (
                     connect_tcp_local(check_port(peer, RELAY_PORT + 1), None, CONNECT_TIMEOUT)
                         .await?,
+                    connect_tcp_local(check_port(peer, RELAY_PORT + 1), None, CONNECT_TIMEOUT)
+                        .await?,
                     true,
                     None,
                 ),
@@ -227,6 +229,11 @@ impl Client {
         // Allow connect to {domain}:{port}
         if hbb_common::is_domain_port_str(peer) {
             return Ok((
+                (
+                    connect_tcp_local(peer, None, CONNECT_TIMEOUT).await?,
+                    true,
+                    None,
+                ),
                 (
                     connect_tcp_local(peer, None, CONNECT_TIMEOUT).await?,
                     true,
@@ -296,6 +303,7 @@ impl Client {
             log::info!("#{} punch attempt with {}, id: {}", i, my_addr, peer);
             let mut msg_out = RendezvousMessage::new();
             use hbb_common::protobuf::Enum;
+            let nat_type = if interface.is_force_relay() || use_ws() || Config::is_proxy() {
             let nat_type = if interface.is_force_relay() || use_ws() || Config::is_proxy() {
                 NatType::SYMMETRIC
             } else {
@@ -2103,6 +2111,12 @@ impl LoginConfigHandler {
         config.image_quality = value;
         self.save_config(config);
         res
+    }
+
+    pub fn save_trackpad_speed(&mut self, speed: i32) {
+        let mut config = self.load_config();
+        config.trackpad_speed = speed;
+        self.save_config(config);
     }
 
     pub fn save_trackpad_speed(&mut self, speed: i32) {

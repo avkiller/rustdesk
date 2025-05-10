@@ -682,6 +682,9 @@ pub static ref T: std::collections::HashMap<&'static str, &'static str> =
         ("save-settings-tip", "تنظیمات را ذخیره کنید"),
         ("dont-show-again-tip", "دیگر نمایش داده نشود"),
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> fb1661c8974db1103c4157069338fbb60db56f2f
         ("Take screenshot", "عکس گرفتن"),
         ("Taking screenshot", "در حال گرفتن عکس"),
         ("screenshot-merged-screen-not-supported-tip", "ادغام تصاویر از نمایشگرهای متعدد در حال حاضر پشتیبانی نمی شود. لطفاً به یک صفحه نمایش واحد تغییر دهید و دوباره امتحان کنید."),
@@ -697,6 +700,7 @@ pub static ref T: std::collections::HashMap<&'static str, &'static str> =
         ("update-failed-check-msi-tip", "بررسی روش نصب انجام نشد. لطفاً برای بارگیری از صفحه انتشار ، روی دکمه 'بارگیری' کلیک کنید و به صورت دستی ارتقا دهید."),
         ("websocket_tip", "فقط اتصالات رله پشتیبانی می شوند ، WebSocket هنگام استفاده از ."),
         ("Use WebSocket", "استفاده کنید WebSocket از"),
+<<<<<<< HEAD
 =======
         ("Take screenshot", ""),
         ("Taking screenshot", ""),
@@ -712,5 +716,7 @@ pub static ref T: std::collections::HashMap<&'static str, &'static str> =
         ("Auto update", ""),
         ("update-failed-check-msi-tip", ""),
 >>>>>>> f8c8710920ad9ef71fc152aa134c02d734e19ba1
+=======
+>>>>>>> fb1661c8974db1103c4157069338fbb60db56f2f
     ].iter().cloned().collect();
 }

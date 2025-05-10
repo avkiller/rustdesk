@@ -687,5 +687,16 @@ pub static ref T: std::collections::HashMap<&'static str, &'static str> =
         ("screenshot-action-tip", "Bitte wählen Sie aus, wie Sie mit dem Screenshot fortfahren möchten."),
         ("Save as", "Speichern unter"),
         ("Copy to clipboard", "In Zwischenablage kopieren"),
+        ("Enable remote printer", "Entfernten Drucker aktivieren"),
+        ("Downloading {}", "{} herunterladen"),
+        ("{} Update", "{} aktualisieren"),
+        ("{}-to-update-tip", "{} wird jetzt geschlossen und die neue Version installiert."),
+        ("download-new-version-failed-tip", "Download fehlgeschlagen. Sie können es erneut versuchen oder auf die Schaltfläche \"Herunterladen\" klicken, um von der Versionsseite herunterzuladen und manuell zu aktualisieren."),
+        ("Auto update", "Automatisch aktualisieren"),
+        ("update-failed-check-msi-tip", "Prüfung der Installationsmethode fehlgeschlagen. Bitte klicken Sie auf die Schaltfläche \"Herunterladen\", um von der Versionsseite herunterzuladen und manuell zu aktualisieren."),
+        ("websocket_tip", ""),
+        ("Use WebSocket", ""),
+        ("Trackpad speed", ""),
+        ("Default trackpad speed", ""),
     ].iter().cloned().collect();
 }

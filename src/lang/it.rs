@@ -687,5 +687,16 @@ pub static ref T: std::collections::HashMap<&'static str, &'static str> =
         ("screenshot-action-tip", "Seleziona come continuare con la schermata."),
         ("Save as", "Salva come"),
         ("Copy to clipboard", "Copia negli appunti"),
+        ("Enable remote printer", "Abilita stampante remota"),
+        ("Downloading {}", "Download {}"),
+        ("{} Update", "Aggiorna {}"),
+        ("{}-to-update-tip", "{} si chiuderà e installerà la nuova versione"),
+        ("download-new-version-failed-tip", "Download non riuscito.\nÈ possibile riprovare o selezionare 'Download' per scaricare e aggiornarlo manualmente."),
+        ("Auto update", "Aggiornamento automatico"),
+        ("update-failed-check-msi-tip", "Controllo metodo installazione non riuscito.\nSeleziona 'Download' per scaricare il programma e aggiornarlo manualmente."),
+        ("websocket_tip", ""),
+        ("Use WebSocket", ""),
+        ("Trackpad speed", ""),
+        ("Default trackpad speed", ""),
     ].iter().cloned().collect();
 }

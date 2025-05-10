@@ -22,12 +22,10 @@ use hbb_common::{
 use std::{
     collections::HashMap,
     path::PathBuf,
-    path::PathBuf,
     sync::{
         atomic::{AtomicI32, Ordering},
         Arc,
     },
-    time::{Duration, SystemTime},
     time::{Duration, SystemTime},
 };
 
@@ -2447,43 +2445,6 @@ pub fn main_get_common(key: String) -> String {
         return false.to_string();
     } else if key == "transfer-job-id" {
         return hbb_common::fs::get_next_job_id().to_string();
-    } else {
-        if key.starts_with("download-data-") {
-            let id = key.replace("download-data-", "");
-            match crate::hbbs_http::downloader::get_download_data(&id) {
-                Ok(data) => serde_json::to_string(&data).unwrap_or_default(),
-                Err(e) => {
-                    format!("error:{}", e)
-                }
-            }
-        } else if key.starts_with("download-file-") {
-            let _version = key.replace("download-file-", "");
-            #[cfg(target_os = "windows")]
-            return match crate::platform::windows::is_msi_installed() {
-                Ok(true) => format!("rustdesk-{_version}-x86_64.msi"),
-                Ok(false) => format!("rustdesk-{_version}-x86_64.exe"),
-                Err(e) => {
-                    log::error!("Failed to check if is msi: {}", e);
-                    format!("error:update-failed-check-msi-tip")
-                }
-            };
-            #[cfg(target_os = "macos")]
-            {
-                return if cfg!(target_arch = "x86_64") {
-                    format!("rustdesk-{_version}-x86_64.dmg")
-                } else if cfg!(target_arch = "aarch64") {
-                    format!("rustdesk-{_version}-aarch64.dmg")
-                } else {
-                    "error:unsupported".to_owned()
-                };
-            }
-            #[cfg(not(any(target_os = "windows", target_os = "macos")))]
-            {
-                "error:unsupported".to_owned()
-            }
-        } else {
-            "".to_owned()
-        }
     } else {
         if key.starts_with("download-data-") {
             let id = key.replace("download-data-", "");

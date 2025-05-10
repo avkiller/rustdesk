@@ -67,6 +67,10 @@ impl RendezvousMediator {
         if crate::platform::is_installed() && !crate::is_custom_client() {
             crate::updater::start_auto_update();
         }
+<<<<<<< HEAD
+=======
+        let mut nat_tested = false;
+>>>>>>> f8c8710920ad9ef71fc152aa134c02d734e19ba1
         check_zombie();
         let server = new_server();
         crate::test_nat_type();

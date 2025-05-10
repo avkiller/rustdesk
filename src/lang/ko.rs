@@ -694,9 +694,12 @@ pub static ref T: std::collections::HashMap<&'static str, &'static str> =
         ("download-new-version-failed-tip", "새 버전 다운로드에 실패했습니다"),
         ("Auto update", "자동 업데이트"),
         ("update-failed-check-msi-tip", "업데이트에 실패했습니다. .msi 설치 파일을 확인하세요."),
+<<<<<<< HEAD
         ("websocket_tip", ""),
         ("Use WebSocket", ""),
         ("Trackpad speed", ""),
         ("Default trackpad speed", ""),
+=======
+>>>>>>> f8c8710920ad9ef71fc152aa134c02d734e19ba1
     ].iter().cloned().collect();
 }

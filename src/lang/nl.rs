@@ -694,18 +694,9 @@ pub static ref T: std::collections::HashMap<&'static str, &'static str> =
         ("download-new-version-failed-tip", "Fout bij het downloaden. Je kunt het opnieuw proberen of op de knop Downloaden klikken om de applicatie van de officiële website te downloaden en handmatig bij te werken."),
         ("Auto update", "Automatisch updaten"),
         ("update-failed-check-msi-tip", "Kan de installatiemethode niet bepalen. Klik op “Downloaden” om de applicatie van de officiële website te downloaden en handmatig bij te werken."),
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> fb1661c8974db1103c4157069338fbb60db56f2f
         ("websocket_tip", ""),
         ("Use WebSocket", ""),
         ("Trackpad speed", ""),
         ("Default trackpad speed", ""),
-<<<<<<< HEAD
-=======
->>>>>>> f8c8710920ad9ef71fc152aa134c02d734e19ba1
-=======
->>>>>>> fb1661c8974db1103c4157069338fbb60db56f2f
     ].iter().cloned().collect();
 }

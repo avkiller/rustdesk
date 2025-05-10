@@ -694,18 +694,9 @@ pub static ref T: std::collections::HashMap<&'static str, &'static str> =
         ("download-new-version-failed-tip", "下载失败，您可以重试或者点击\"下载\"按钮，从发布网址下载，并手动升级。"),
         ("Auto update", ""),
         ("update-failed-check-msi-tip", "安装方式检测失败。请点击\"下载\"按钮，从发布网址下载，并手动升级。"),
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> fb1661c8974db1103c4157069338fbb60db56f2f
         ("websocket_tip", "使用 WebSocket 时，仅支持中继连接。"),
         ("Use WebSocket", "使用 WebSocket"),
         ("Trackpad speed", "触控板速度"),
         ("Default trackpad speed", "默认触控板速度"),
-<<<<<<< HEAD
-=======
->>>>>>> f8c8710920ad9ef71fc152aa134c02d734e19ba1
-=======
->>>>>>> fb1661c8974db1103c4157069338fbb60db56f2f
     ].iter().cloned().collect();
 }

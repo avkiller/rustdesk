@@ -694,12 +694,9 @@ pub static ref T: std::collections::HashMap<&'static str, &'static str> =
         ("download-new-version-failed-tip", ""),
         ("Auto update", ""),
         ("update-failed-check-msi-tip", ""),
-<<<<<<< HEAD
         ("websocket_tip", ""),
         ("Use WebSocket", ""),
         ("Trackpad speed", ""),
         ("Default trackpad speed", ""),
-=======
->>>>>>> f8c8710920ad9ef71fc152aa134c02d734e19ba1
     ].iter().cloned().collect();
 }

@@ -80,6 +80,7 @@ class _SettingsState extends State<SettingsPage> with WidgetsBindingObserver {
   var _enableDirectIPAccess = true;
   var _enableRecordSession = false;
   var _enableHardwareCodec = true;
+  var _allowWebSocket = false;
   var _autoRecordIncomingSession = false;
   var _autoRecordOutgoingSession = false;
   var _allowAutoDisconnect = false;
@@ -91,7 +92,6 @@ class _SettingsState extends State<SettingsPage> with WidgetsBindingObserver {
   var _hideServer = false;
   var _hideProxy = false;
   var _hideNetwork = false;
-  var _hideWebSocket = false;
   var _hideWebSocket = false;
   var _enableTrustedDevices = false;
 
@@ -108,7 +108,6 @@ class _SettingsState extends State<SettingsPage> with WidgetsBindingObserver {
     _enableHardwareCodec = option2bool(kOptionEnableHwcodec,
         bind.mainGetOptionSync(key: kOptionEnableHwcodec));
     _allowWebSocket = mainGetBoolOptionSync(kOptionAllowWebSocket);
-    _allowWebSocket = mainGetBoolOptionSync(kOptionAllowWebSocket);
     _autoRecordIncomingSession = option2bool(kOptionAllowAutoRecordIncoming,
         bind.mainGetOptionSync(key: kOptionAllowAutoRecordIncoming));
     _autoRecordOutgoingSession = option2bool(kOptionAllowAutoRecordOutgoing,
@@ -124,8 +123,6 @@ class _SettingsState extends State<SettingsPage> with WidgetsBindingObserver {
     _hideProxy = bind.mainGetBuildinOption(key: kOptionHideProxySetting) == 'Y';
     _hideNetwork =
         bind.mainGetBuildinOption(key: kOptionHideNetworkSetting) == 'Y';
-    _hideWebSocket =
-        true; //bind.mainGetBuildinOption(key: kOptionHideWebSocketSetting) == 'Y';
     _hideWebSocket =
         true; //bind.mainGetBuildinOption(key: kOptionHideWebSocketSetting) == 'Y';
     _enableTrustedDevices = mainGetBoolOptionSync(kOptionEnableTrustedDevices);
@@ -677,21 +674,6 @@ class _SettingsState extends State<SettingsPage> with WidgetsBindingObserver {
                 onPressed: (context) {
                   changeSocks5Proxy();
                 }),
-          if (!disabledSettings && !_hideNetwork && !_hideWebSocket)
-            SettingsTile.switchTile(
-              title: Text(translate('Use WebSocket')),
-              initialValue: _allowWebSocket,
-              onToggle: isOptionFixed(kOptionAllowWebSocket)
-                  ? null
-                  : (v) async {
-                      await mainSetBoolOption(kOptionAllowWebSocket, v);
-                      final newValue =
-                          await mainGetBoolOption(kOptionAllowWebSocket);
-                      setState(() {
-                        _allowWebSocket = newValue;
-                      });
-                    },
-            ),
           if (!disabledSettings && !_hideNetwork && !_hideWebSocket)
             SettingsTile.switchTile(
               title: Text(translate('Use WebSocket')),

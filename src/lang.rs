@@ -43,7 +43,7 @@ mod th;
 mod tr;
 mod tw;
 mod uk;
-mod vn;
+mod vi;
 mod ta;
 mod ge;
 
@@ -103,7 +103,7 @@ pub fn translate_locale(name: String, locale: &str) -> String {
         "cs" => cs::T.deref(),
         "da" => da::T.deref(),
         "sk" => sk::T.deref(),
-        "vn" => vn::T.deref(),
+        "vi" => vi::T.deref(),
         "pl" => pl::T.deref(),
         "ja" => ja::T.deref(),
         "ko" => ko::T.deref(),

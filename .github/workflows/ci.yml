@@ -15,6 +15,7 @@ on:
       - "docs/**"
       - "README.md"
       - ".gitmodules"
+      - "src/lang/**"
   push:
     branches:
       - master
@@ -26,6 +27,7 @@ on:
       - "appimage/**"
       - "flatpak/**"
       - ".gitmodules"
+      - "src/lang/**"
 
 jobs:
   # ensure_cargo_fmt:

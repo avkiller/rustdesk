@@ -4,8 +4,8 @@ on:
   #push:
   #  branches:
   #    - main
-  #schedule:
-  #  - cron: '0 0 * * *'  # 每天UTC时间0:00执行
+  schedule:
+    - cron: '14 00 * * *'  # 每天UTC时间0:00执行
   workflow_dispatch:
 
 jobs:
@@ -14,25 +14,23 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+        uses: actions/checkout@v3
 
       - name: Update Submodules
         run: |
           git config --global user.email "avkiller2012@gmail.com"
           git config --global user.name "avkiller"
-          # git subtree pull --prefix=libs/hbb_common https://github.com/avkiller/hbb_common.git main --squash --message="updatelib"
           git submodule update --init --recursive
           git submodule update --recursive --remote
-          # 备份当前修改（如有）
-          # git checkout master
-          # git rm -r libs/hbb_common
-          # git commit -m "Remove subtree to reset history"
-          # git subtree add --prefix=libs/hbb_common https://github.com/avkiller/hbb_common.git main --squash
-          # git add libs/hbb_common
+          
+      - name: Check for changes
+        id: check_changes
+        run: |
+          # echo "::set-output name=changes::$(git status --porcelain)"
+          echo "changes=$(git status --porcelain)" >> $GITHUB_OUTPUT
+      - name: Commit and push changes
+        if: steps.check_changes.outputs.changes != ''
+        run: |
           git add .
-          git commit --no-verify -m "Update submodules"
-          git status
-          git push origin master
-
+          git commit -m "Update submodules"
+          git push

@@ -1,9 +1,9 @@
 name: Update Submodules
 
 on:
-  #push:
-  #  branches:
-  #    - main
+  push:
+    branches:
+      - main
   schedule:
     - cron: '14 14 * * *'  # 每天UTC时间0:00执行
   workflow_dispatch:

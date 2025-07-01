@@ -18,6 +18,7 @@ jobs:
           git submodule update --init --recursive
           git submodule update --recursive --remote
           cd libs/hbb_common
+          git fetch --all
           git submodule foreach 
           git fetch --prune
           cd ..

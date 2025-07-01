@@ -20,7 +20,7 @@ jobs:
           cd libs/hbb_common
           git submodule foreach 
           git fetch --prune
-          
+          cd ..
           git checkout -b rustdesk-master master
           git pull https://github.com/rustdesk/rustdesk.git master
           

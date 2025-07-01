@@ -1,4 +1,4 @@
-name: auto merge Submodules
+name: Auto merge Submodules
 
 on:
   workflow_dispatch:
@@ -15,10 +15,12 @@ jobs:
         run: |
           git config --global user.email "avkiller2012@gmail.com"
           git config --global user.name "avkiller"
-          git submodule foreach 
-          git fetch --prune
           git submodule update --init --recursive
           git submodule update --recursive --remote
+          cd libs/hbb_common
+          git submodule foreach 
+          git fetch --prune
+          
           git checkout -b rustdesk-master master
           git pull https://github.com/rustdesk/rustdesk.git master
           

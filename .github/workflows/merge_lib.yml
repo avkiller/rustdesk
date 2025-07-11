@@ -9,12 +9,15 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
 
       - name: Update Submodules
         run: |
           git config --global user.email "avkiller2012@gmail.com"
           git config --global user.name "avkiller"
+          git pull
           git submodule update --init --recursive
           git submodule update --recursive --remote
           git checkout -b rustdesk-master master

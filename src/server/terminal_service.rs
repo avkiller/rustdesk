@@ -98,10 +98,15 @@ fn get_default_shell() -> String {
     }
 }
 
+pub fn is_service_specified_user(service_id: &str) -> Option<bool> {
+    get_service(service_id).map(|s| s.lock().unwrap().is_specified_user)
+}
+
 /// Get or create a persistent terminal service
 fn get_or_create_service(
     service_id: String,
     is_persistent: bool,
+    is_specified_user: bool,
 ) -> Result<Arc<Mutex<PersistentTerminalService>>> {
     let mut services = TERMINAL_SERVICES.lock().unwrap();
 
@@ -124,6 +129,7 @@ fn get_or_create_service(
             Arc::new(Mutex::new(PersistentTerminalService::new(
                 service_id.clone(),
                 is_persistent,
+                is_specified_user,
             )))
         })
         .clone();
@@ -131,7 +137,7 @@ fn get_or_create_service(
     // Ensure cleanup task is running
     ensure_cleanup_task();
 
-    service.lock().unwrap().needs_session_sync = true;
+    service.lock().unwrap().reset_status(is_persistent);
 
     Ok(service)
 }
@@ -306,7 +312,11 @@ pub fn new(
     user_token: Option<UserToken>,
 ) -> GenericService {
     // Create the service with initial persistence setting
-    allow_err!(get_or_create_service(service_id.clone(), is_persistent));
+    allow_err!(get_or_create_service(
+        service_id.clone(),
+        is_persistent,
+        user_token.is_some()
+    ));
     let svc = TerminalService {
         sp: GenericService::new(service_id.clone(), false),
         user_token,
@@ -447,6 +457,7 @@ pub struct TerminalSession {
     cols: u16,
     // Track if we've already sent the closed message
     closed_message_sent: bool,
+    is_opened: bool,
 }
 
 impl TerminalSession {
@@ -467,6 +478,7 @@ impl TerminalSession {
             rows,
             cols,
             closed_message_sent: false,
+            is_opened: false,
         }
     }
 
@@ -477,6 +489,7 @@ impl TerminalSession {
     // This helper function is to ensure that the threads are joined before the child process is dropped.
     // Though this is not strictly necessary on macOS.
     fn stop(&mut self) {
+        self.is_opened = false;
         self.exiting.store(true, Ordering::SeqCst);
 
         // Drop the input channel to signal writer thread to exit
@@ -543,10 +556,11 @@ pub struct PersistentTerminalService {
     last_activity: Instant,
     pub is_persistent: bool,
     needs_session_sync: bool,
+    is_specified_user: bool,
 }
 
 impl PersistentTerminalService {
-    pub fn new(service_id: String, is_persistent: bool) -> Self {
+    pub fn new(service_id: String, is_persistent: bool, is_specified_user: bool) -> Self {
         Self {
             service_id,
             sessions: HashMap::new(),
@@ -554,6 +568,7 @@ impl PersistentTerminalService {
             last_activity: Instant::now(),
             is_persistent,
             needs_session_sync: false,
+            is_specified_user,
         }
     }
 
@@ -595,6 +610,15 @@ impl PersistentTerminalService {
     /// Check if service has active terminals
     pub fn has_active_terminals(&self) -> bool {
         !self.sessions.is_empty()
+    }
+
+    fn reset_status(&mut self, is_persistent: bool) {
+        self.is_persistent = is_persistent;
+        self.needs_session_sync = true;
+        for session in self.sessions.values() {
+            let mut session = session.lock().unwrap();
+            session.is_opened = false;
+        }
     }
 }
 
@@ -690,7 +714,8 @@ impl TerminalServiceProxy {
         // Check if terminal already exists
         if let Some(session_arc) = service.sessions.get(&open.terminal_id) {
             // Reconnect to existing terminal
-            let session = session_arc.lock().unwrap();
+            let mut session = session_arc.lock().unwrap();
+            session.is_opened = true;
             let mut opened = TerminalOpened::new();
             opened.terminal_id = open.terminal_id;
             opened.success = true;
@@ -860,6 +885,7 @@ impl TerminalServiceProxy {
         session.output_rx = Some(output_rx);
         session.reader_thread = Some(reader_thread);
         session.writer_thread = Some(writer_thread);
+        session.is_opened = true;
 
         let mut opened = TerminalOpened::new();
         opened.terminal_id = open.terminal_id;
@@ -997,6 +1023,17 @@ impl TerminalServiceProxy {
                         }
                     }
                 }
+                // It's Ok to put the closed message here.
+                // Because the `reader_thread` is joined in `stop()`,
+                // and `stop()` is called before the session is dropped.
+                if should_send_closed {
+                    closed_terminals.push(terminal_id);
+                }
+
+                if !session.is_opened {
+                    // Skip the session if it is not opened.
+                    continue;
+                }
 
                 // Read from output channel
                 let mut has_activity = false;
@@ -1040,10 +1077,6 @@ impl TerminalServiceProxy {
 
                 if has_activity {
                     session.update_activity();
-                }
-
-                if should_send_closed {
-                    closed_terminals.push(terminal_id);
                 }
             }
         }

@@ -178,6 +178,7 @@ pub enum AuthConnType {
 #[derive(Clone, Debug)]
 enum TerminalUserToken {
     SelfUser,
+    #[cfg(target_os = "windows")]
     CurrentLogonUser(crate::terminal_service::UserToken),
 }
 
@@ -186,6 +187,7 @@ impl TerminalUserToken {
     fn to_terminal_service_token(&self) -> Option<crate::terminal_service::UserToken> {
         match self {
             TerminalUserToken::SelfUser => None,
+            #[cfg(target_os = "windows")]
             TerminalUserToken::CurrentLogonUser(token) => Some(*token),
         }
     }
@@ -1318,7 +1320,7 @@ impl Connection {
 
         #[cfg(not(target_os = "android"))]
         {
-            pi.hostname = hbb_common::whoami::hostname();
+            pi.hostname = crate::whoami_hostname();
             pi.platform = hbb_common::whoami::platform().to_string();
         }
         #[cfg(target_os = "android")]
@@ -1937,6 +1939,16 @@ impl Connection {
     }
 
     async fn on_message(&mut self, msg: Message) -> bool {
+        if let Some(message::Union::Misc(misc)) = &msg.union {
+            // Move the CloseReason forward, as this message needs to be received when unauthorized, especially for kcp.
+            if let Some(misc::Union::CloseReason(s)) = &misc.union {
+                log::info!("receive close reason: {}", s);
+                self.on_close("Peer close", true).await;
+                raii::AuthedConnID::check_remove_session(self.inner.id(), self.session_key());
+                return false;
+            }
+        }
+        // After handling CloseReason messages, proceed to process other message types
         if let Some(message::Union::LoginRequest(lr)) = msg.union {
             self.handle_login_request_without_validation(&lr).await;
             if self.authorized {
@@ -2790,15 +2802,6 @@ impl Connection {
                             Some(Instant::now().into()),
                         );
                     }
-                    Some(misc::Union::CloseReason(_)) => {
-                        self.on_close("Peer close", true).await;
-                        raii::AuthedConnID::check_remove_session(
-                            self.inner.id(),
-                            self.session_key(),
-                        );
-                        return false;
-                    }
-
                     Some(misc::Union::RestartRemoteDevice(_)) => {
                         #[cfg(not(any(target_os = "android", target_os = "ios")))]
                         if self.restart {
@@ -3313,6 +3316,7 @@ impl Connection {
                     {
                         return;
                     }
+                    #[allow(unused_mut)]
                     let mut record_changed = true;
                     #[cfg(windows)]
                     if virtual_display_manager::amyuni_idd::is_my_display(&name) {
@@ -3934,7 +3938,6 @@ impl Connection {
     #[cfg(feature = "unix-file-copy-paste")]
     async fn handle_file_clip(&mut self, clip: clipboard::ClipboardFile) {
         let is_stopping_allowed = clip.is_stopping_allowed();
-        let is_keyboard_enabled = self.peer_keyboard_enabled();
         let file_transfer_enabled = self.file_transfer_enabled();
         let stop = is_stopping_allowed && !file_transfer_enabled;
         log::debug!(
@@ -4625,6 +4628,7 @@ mod raii {
                 .send((conn_count, remote_count)));
         }
 
+        #[cfg(windows)]
         pub fn non_port_forward_conn_count() -> usize {
             AUTHED_CONNS
                 .lock()

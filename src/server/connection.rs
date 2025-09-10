@@ -649,6 +649,9 @@ impl Connection {
                         }
                         #[cfg(target_os = "windows")]
                         ipc::Data::ClipboardFile(clip) => {
+                            if !conn.is_remote() {
+                                continue;
+                            }
                             match clip {
                                 clipboard::ClipboardFile::Files { files } => {
                                     let files = files.into_iter().map(|(f, s)| {
@@ -2329,6 +2332,8 @@ impl Connection {
                             self.show_my_cursor,
                         );
                     } else if self.show_my_cursor {
+                        #[cfg(target_os = "macos")]
+                        self.retina.on_mouse_event(&mut me, self.display_idx);
                         self.input_mouse(
                             me,
                             self.inner.id(),
@@ -3697,20 +3702,35 @@ impl Connection {
                 self.update_terminal_persistence(q == BoolOption::Yes).await;
             }
         }
-        #[cfg(target_os = "windows")]
+        #[cfg(not(any(target_os = "android", target_os = "ios")))]
         if let Ok(q) = o.show_my_cursor.enum_value() {
             if q != BoolOption::NotSet {
                 use crate::whiteboard;
                 self.show_my_cursor = q == BoolOption::Yes;
+                #[cfg(target_os = "windows")]
+                let is_lower_win10 = !crate::platform::windows::is_win_10_or_greater();
+                #[cfg(not(target_os = "windows"))]
+                let is_lower_win10 = false;
+                #[cfg(target_os = "linux")]
+                let is_linux_supported = crate::whiteboard::is_supported();
+                #[cfg(not(target_os = "linux"))]
+                let is_linux_supported = false;
+                let not_support_msg = if is_lower_win10 {
+                    "Windows 10 or greater is required."
+                } else if cfg!(target_os = "linux") && !is_linux_supported {
+                    "This feature is not supported on native Wayland, please install XWayland or switch to X11."
+                } else {
+                    ""
+                };
                 if q == BoolOption::Yes {
-                    if crate::platform::windows::is_win_10_or_greater() {
+                    if not_support_msg.is_empty() {
                         whiteboard::register_whiteboard(whiteboard::get_key_cursor(self.inner.id));
                     } else {
                         let mut msg_out = Message::new();
                         let res = MessageBox {
                             msgtype: "nook-nocancel-hasclose".to_owned(),
                             title: "Show my cursor".to_owned(),
-                            text: "Windows 10 or greater is required.".to_owned(),
+                            text: not_support_msg.to_owned(),
                             link: "".to_owned(),
                             ..Default::default()
                         };
@@ -3718,7 +3738,7 @@ impl Connection {
                         self.send(msg_out).await;
                     }
                 } else {
-                    if crate::platform::windows::is_win_10_or_greater() {
+                    if not_support_msg.is_empty() {
                         whiteboard::unregister_whiteboard(whiteboard::get_key_cursor(
                             self.inner.id,
                         ));
@@ -4878,7 +4898,7 @@ mod raii {
                 scrap::wayland::pipewire::try_close_session();
             }
             Self::check_wake_lock();
-            #[cfg(target_os = "windows")]
+            #[cfg(not(any(target_os = "android", target_os = "ios")))]
             {
                 use crate::whiteboard;
                 whiteboard::unregister_whiteboard(whiteboard::get_key_cursor(self.0));

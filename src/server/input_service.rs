@@ -2,7 +2,7 @@
 use super::rdp_input::client::{RdpInputKeyboard, RdpInputMouse};
 use super::*;
 use crate::input::*;
-#[cfg(target_os = "windows")]
+#[cfg(not(any(target_os = "android", target_os = "ios")))]
 use crate::whiteboard;
 #[cfg(target_os = "macos")]
 use dispatch::Queue;
@@ -204,6 +204,7 @@ impl LockModesHandler {
         }
 
         let mut num_lock_changed = false;
+        #[allow(unused)]
         let mut event_num_enabled = false;
         if is_numpad_key {
             let local_num_enabled = en.get_key_state(enigo::Key::NumLock);
@@ -991,17 +992,17 @@ pub fn handle_pointer_(evt: &PointerDeviceEvent, conn: i32) {
 pub fn handle_mouse_(
     evt: &MouseEvent,
     conn: i32,
-    username: String,
-    argb: u32,
+    _username: String,
+    _argb: u32,
     simulate: bool,
     _show_cursor: bool,
 ) {
     if simulate {
         handle_mouse_simulation_(evt, conn);
     }
-    #[cfg(target_os = "windows")]
+    #[cfg(not(any(target_os = "android", target_os = "ios")))]
     if _show_cursor {
-        handle_mouse_show_cursor_(evt, conn, username, argb);
+        handle_mouse_show_cursor_(evt, conn, _username, _argb);
     }
 }
 
@@ -1148,7 +1149,7 @@ pub fn handle_mouse_simulation_(evt: &MouseEvent, conn: i32) {
     }
 }
 
-#[cfg(target_os = "windows")]
+#[cfg(not(any(target_os = "android", target_os = "ios")))]
 pub fn handle_mouse_show_cursor_(evt: &MouseEvent, conn: i32, username: String, argb: u32) {
     let buttons = evt.mask >> 3;
     let evt_type = evt.mask & 0x7;

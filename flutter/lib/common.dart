@@ -13,11 +13,13 @@ import 'package:flutter_hbb/desktop/widgets/refresh_wrapper.dart';
 import 'package:flutter_hbb/desktop/widgets/tabbar_widget.dart';
 import 'package:flutter_hbb/main.dart';
 import 'package:flutter_hbb/models/peer_model.dart';
+import 'package:flutter_hbb/models/peer_tab_model.dart';
 import 'package:flutter_hbb/models/state_model.dart';
 import 'package:flutter_hbb/utils/multi_window_manager.dart';
 import 'package:flutter_hbb/utils/platform_channel.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
+import 'package:get/get_rx/src/rx_workers/utils/debouncer.dart';
 import 'package:provider/provider.dart';
 import 'package:uni_links/uni_links.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -75,6 +77,8 @@ bool _ignoreDevicePixelRatio = true;
 int windowsBuildNumber = 0;
 DesktopType? desktopType;
 
+// Tolerance used for floating-point position comparisons to avoid precision errors.
+const double _kPositionEpsilon = 1e-6;
 bool get isMainDesktopWindow =>
     desktopType == DesktopType.main || desktopType == DesktopType.cm;
 
@@ -104,6 +108,9 @@ enum DesktopType {
   terminal,
   cm,
   portForward,
+}
+bool isDoubleEqual(double a, double b) {
+  return (a - b).abs() < _kPositionEpsilon;
 }
 
 class IconFont {
@@ -1622,7 +1629,8 @@ bool mainGetPeerBoolOptionSync(String id, String key) {
 // Use `sessionGetToggleOption()` and `sessionToggleOption()` instead.
 // Because all session options use `Y` and `<Empty>` as values.
 
-Future<bool> matchPeer(String searchText, Peer peer) async {
+Future<bool> matchPeer(
+    String searchText, Peer peer, PeerTabIndex peerTabIndex) async {
   if (searchText.isEmpty) {
     return true;
   }
@@ -1633,11 +1641,14 @@ Future<bool> matchPeer(String searchText, Peer peer) async {
       peer.username.toLowerCase().contains(searchText)) {
     return true;
   }
-  final alias = peer.alias;
-  if (alias.isEmpty) {
-    return false;
+  if (peer.alias.toLowerCase().contains(searchText)) {
+    return true;
   }
-  return alias.toLowerCase().contains(searchText);
+  if (peerTabShowNote(peerTabIndex) &&
+      peer.note.toLowerCase().contains(searchText)) {
+    return true;
+  }
+  return false;
 }
 
 /// Get the image for the current [platform].
@@ -1666,6 +1677,15 @@ class LastWindowPosition {
 
   LastWindowPosition(this.width, this.height, this.offsetWidth,
       this.offsetHeight, this.isMaximized, this.isFullscreen);
+  bool equals(LastWindowPosition other) {
+    return (
+      (width == other.width) &&
+      (height == other.height) &&
+      (offsetWidth == other.offsetWidth) &&
+      (offsetHeight == other.offsetHeight) &&
+      (isMaximized == other.isMaximized) &&
+      (isFullscreen == other.isFullscreen));
+  }
 
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
@@ -1706,9 +1726,12 @@ String get windowFramePrefix =>
         ? "incoming_"
         : (bind.isOutgoingOnly() ? "outgoing_" : ""));
 
+typedef WindowKey = ({WindowType type, int? windowId});
+LastWindowPosition? _lastWindowPosition = null;
+final Debouncer _saveWindowDebounce = Debouncer(delay: Duration(seconds: 1));
 /// Save window position and size on exit
 /// Note that windowId must be provided if it's subwindow
-Future<void> saveWindowPosition(WindowType type, {int? windowId}) async {
+Future<void> saveWindowPosition(WindowType type, {int? windowId, bool? flush}) async {
   if (type != WindowType.Main && windowId == null) {
     debugPrint(
         "Error: windowId cannot be null when saving positions for sub window");
@@ -1777,16 +1800,34 @@ Future<void> saveWindowPosition(WindowType type, {int? windowId}) async {
 
   final pos = LastWindowPosition(
       sz.width, sz.height, position.dx, position.dy, isMaximized, isFullscreen);
-  debugPrint(
-      "Saving frame: $windowId: ${pos.width}/${pos.height}, offset:${pos.offsetWidth}/${pos.offsetHeight}, isMaximized:${pos.isMaximized}, isFullscreen:${pos.isFullscreen}");
+  final WindowKey key = (type: type, windowId: windowId);
+  final bool haveNewWindowPosition = (_lastWindowPosition == null) || !pos.equals(_lastWindowPosition!);
+  final bool isPreviousNewWindowPositionPending = _saveWindowDebounce.isRunning;
+  if (haveNewWindowPosition || isPreviousNewWindowPositionPending) {
+    _lastWindowPosition = pos;
+    if (flush ?? false) {
+      // If a previous update is pending, replace it.
+      _saveWindowDebounce.cancel();
+      await _saveWindowPositionActual(key);
+    } else if (haveNewWindowPosition) {
+      _saveWindowDebounce.call(() => _saveWindowPositionActual(key));
+    }
+  }
+}
+Future<void> _saveWindowPositionActual(WindowKey key) async {
+  LastWindowPosition? pos = _lastWindowPosition;
+  if (pos != null) {
+    debugPrint(
+        "Saving frame: ${key.windowId}: ${pos.width}/${pos.height}, offset:${pos.offsetWidth}/${pos.offsetHeight}, isMaximized:${pos.isMaximized}, isFullscreen:${pos.isFullscreen}");
 
   await bind.setLocalFlutterOption(
-      k: windowFramePrefix + type.name, v: pos.toString());
+        k: windowFramePrefix + key.type.name, v: pos.toString());
 
-  if ((type == WindowType.RemoteDesktop || type == WindowType.ViewCamera) &&
-      windowId != null) {
+    if ((key.type == WindowType.RemoteDesktop || key.type == WindowType.ViewCamera) &&
+        key.windowId != null) {
     await _saveSessionWindowPosition(
-        type, windowId, isMaximized, isFullscreen, pos);
+          key.type, key.windowId!, pos.isMaximized ?? false, pos.isFullscreen ?? false, pos);
+    }
   }
 }
 
@@ -1852,6 +1893,8 @@ Future<Size> _adjustRestoreMainWindowSize(double? width, double? height) async {
   return Size(restoreWidth, restoreHeight);
 }
 
+// Consider using Rect.contains() instead,
+// though the implementation is not exactly the same.
 bool isPointInRect(Offset point, Rect rect) {
   return point.dx >= rect.left &&
       point.dx <= rect.right &&
@@ -1949,8 +1992,24 @@ Future<bool> restoreWindowPosition(WindowType type,
 
   var lpos = LastWindowPosition.loadFromString(pos);
   if (lpos == null) {
-    debugPrint("no window position saved, ignoring position restoration");
-    return false;
+    debugPrint("No window position saved, trying to center the window.");
+    switch (type) {
+      case WindowType.Main:
+        // Center the main window only if no position is saved (on first run).
+        if (isWindows || isLinux) {
+          await windowManager.center();
+        }
+        // For MacOS, the window is already centered by default.
+        // See https://github.com/rustdesk/rustdesk/blob/9b9276e7524523d7f667fefcd0694d981443df0e/flutter/macos/Runner/Base.lproj/MainMenu.xib#L333
+        // If `<windowPositionMask>` in `<window>` is not set, the window will be centered.
+        break;
+      default:
+        // No need to change the position of a sub window if no position is saved,
+        // since the default position is already centered.
+        // https://github.com/rustdesk/rustdesk/blob/317639169359936f7f9f85ef445ec9774218772d/flutter/lib/utils/multi_window_manager.dart#L163
+        break;
+    }
+    return true;
   }
   if (type == WindowType.RemoteDesktop || type == WindowType.ViewCamera) {
     if (!isRemotePeerPos && windowId != null) {
@@ -3942,4 +4001,7 @@ String decode_http_response(http.Response resp) {
     // Fallback to bodyString which handles encoding automatically
     return resp.body;
   }
+}
+bool peerTabShowNote(PeerTabIndex peerTabIndex) {
+  return peerTabIndex == PeerTabIndex.ab || peerTabIndex == PeerTabIndex.group;
 }

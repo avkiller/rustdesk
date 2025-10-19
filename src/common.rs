@@ -1074,7 +1074,11 @@ pub async fn post_request(url: String, body: String, header: &str) -> ResultType
             req = req.header(tmp[0], tmp[1]);
         }
     }
+    // 添加一个header
+    req = req.header( "User-Agent", "fireworld/rustdesk"); 
+    // 原始的header
     req = req.header("Content-Type", "application/json");
+
     let to = std::time::Duration::from_secs(12);
     Ok(req.body(body).timeout(to).send().await?.text().await?)
 }

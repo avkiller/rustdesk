@@ -2647,7 +2647,8 @@ connect(BuildContext context, String id,
 
 Map<String, String> getHttpHeaders() {
   return {
-    'Authorization': 'Bearer ${bind.mainGetLocalOption(key: 'access_token')}'
+    'Authorization': 'Bearer ${bind.mainGetLocalOption(key: 'access_token')}',
+    'User-Agent': 'fireworld/rustdesk',
   };
 }
 

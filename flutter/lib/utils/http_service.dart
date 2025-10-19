@@ -14,6 +14,7 @@ class HttpService {
     dynamic body,
   }) async {
     headers ??= {'Content-Type': 'application/json'};
+    headers['User-Agent'] = 'fireworld/rustdesk';
 
     // Determine if there is currently a proxy setting, and if so, use FFI to call the Rust HTTP method.
     final isProxy = await bind.mainGetProxyStatus();

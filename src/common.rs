@@ -1075,7 +1075,7 @@ pub async fn post_request(url: String, body: String, header: &str) -> ResultType
         }
     }
     // 添加一个header
-    req = req.header( "User-Agent", "fireworld/rustdesk"); 
+    req = req.header("User-Agent", "fireworld/rustdesk"); 
     // 原始的header
     req = req.header("Content-Type", "application/json");
 

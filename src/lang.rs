@@ -46,6 +46,7 @@ mod uk;
 mod vi;
 mod ta;
 mod ge;
+mod fi;
 
 pub const LANGS: &[(&str, &str)] = &[
     ("en", "English"),
@@ -110,6 +111,7 @@ pub fn translate_locale(name: String, locale: &str) -> String {
         "kz" => kz::T.deref(),
         "uk" => uk::T.deref(),
         "fa" => fa::T.deref(),
+        "fi" => fi::T.deref(),
         "ca" => ca::T.deref(),
         "el" => el::T.deref(),
         "sv" => sv::T.deref(),

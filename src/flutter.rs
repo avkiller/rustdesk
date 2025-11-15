@@ -23,7 +23,7 @@ use std::{
     os::raw::{c_char, c_int, c_void},
     str::FromStr,
     sync::{
-        atomic::{AtomicBool, Ordering},
+        atomic::{AtomicBool, AtomicUsize, Ordering},
         Arc, RwLock,
     },
 };
@@ -756,7 +756,7 @@ impl InvokeUiSession for FlutterHandler {
     // unused in flutter
     fn clear_all_jobs(&self) {}
 
-    fn load_last_job(&self, _cnt: i32, job_json: &str) {
+    fn load_last_job(&self, _cnt: i32, job_json: &str, _auto_start: bool) {
         self.push_event("load_last_job", &[("value", job_json)], &[]);
     }
 
@@ -1328,6 +1328,7 @@ pub fn session_add(
         server_keyboard_enabled: Arc::new(RwLock::new(true)),
         server_file_transfer_enabled: Arc::new(RwLock::new(true)),
         server_clipboard_enabled: Arc::new(RwLock::new(true)),
+        reconnect_count: Arc::new(AtomicUsize::new(0)),
         ..Default::default()
     };
 
@@ -2100,6 +2101,26 @@ pub mod sessions {
         #[cfg(not(any(target_os = "android", target_os = "ios")))]
         update_session_count_to_server();
         s
+    }
+
+    /// Check if removing a session by session_id would result in removing the entire peer.
+    ///
+    /// Returns:
+    /// - `true`: The session exists and removing it would leave the peer with no other sessions,
+    ///           so the entire peer would be removed (equivalent to `remove_session_by_session_id` returning `Some`)
+    /// - `false`: The session doesn't exist, or it exists but the peer has other sessions,
+    ///            so the peer would not be removed (equivalent to `remove_session_by_session_id` returning `None`)
+    #[inline]
+    pub fn would_remove_peer_by_session_id(id: &SessionID) -> bool {
+        for (_peer_key, s) in SESSIONS.read().unwrap().iter() {
+            let read_lock = s.ui_handler.session_handlers.read().unwrap();
+            if read_lock.contains_key(id) {
+                // Found the session, check if it's the only one for this peer
+                return read_lock.len() == 1;
+            }
+        }
+        // Session not found
+        false
     }
 
     fn check_remove_unused_displays(

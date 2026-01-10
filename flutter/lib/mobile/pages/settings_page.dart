@@ -624,6 +624,23 @@ class _SettingsState extends State<SettingsPage> with WidgetsBindingObserver {
       ),
     );
 
+    enhancementsTiles.add(
+      SettingsTile.switchTile(
+        initialValue: _showTerminalExtraKeys,
+        title: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text(translate('Show terminal extra keys')),
+        ]),
+        onToggle: (bool v) async {
+          await mainSetLocalBoolOption(kOptionEnableShowTerminalExtraKeys, v);
+          final newValue =
+            mainGetLocalBoolOptionSync(kOptionEnableShowTerminalExtraKeys);
+          setState(() {
+            _showTerminalExtraKeys = newValue;
+          });
+        },
+      ),
+    );
+
     onFloatingWindowChanged(bool toValue) async {
       if (toValue) {
         if (!await AndroidPermissionManager.check(kSystemAlertWindow)) {

@@ -827,7 +827,8 @@ class _SafetyState extends State<_Safety> with AutomaticKeepAliveClientMixin {
                 permissions(context),
                 password(context),
                 _Card(title: '2FA', children: [tfa()]),
-                _Card(title: 'ID', children: [changeId()]),
+                if (!isChangeIdDisabled())
+                  _Card(title: 'ID', children: [changeId()]),
                 more(context),
               ]),
             ),
@@ -1093,6 +1094,10 @@ class _SafetyState extends State<_Safety> with AutomaticKeepAliveClientMixin {
                                         .indexOf(kUsePermanentPassword)] &&
                                 (await bind.mainGetPermanentPassword())
                                     .isEmpty) {
+                              if (isChangePermanentPasswordDisabled()) {
+                                await callback();
+                                return;
+                              }
                               setPasswordDialog(notEmptyCallback: callback);
                             } else {
                               await callback();
@@ -1197,7 +1202,7 @@ class _SafetyState extends State<_Safety> with AutomaticKeepAliveClientMixin {
                   enabled: tmpEnabled && !locked),
             if (usePassword) numericOneTimePassword,
             if (usePassword) radios[1],
-            if (usePassword)
+            if (usePassword && !isChangePermanentPasswordDisabled())
               _SubButton('Set permanent password', setPasswordDialog,
                   permEnabled && !locked),
             // if (usePassword)
@@ -1220,7 +1225,7 @@ class _SafetyState extends State<_Safety> with AutomaticKeepAliveClientMixin {
         _OptionCheckBox(context, 'allow-only-conn-window-open-tip',
             'allow-only-conn-window-open',
             reverse: false, enabled: enabled),
-      if (bind.mainIsInstalled()) unlockPin()
+      if (bind.mainIsInstalled() && !isUnlockPinDisabled()) unlockPin()
     ]);
   }
 
@@ -2656,7 +2661,7 @@ Widget _lock(
                           ]).marginSymmetric(vertical: 2)),
                   onPressed: () async {
                     final unlockPin = bind.mainGetUnlockPin();
-                    if (unlockPin.isEmpty) {
+                    if (unlockPin.isEmpty || isUnlockPinDisabled()) {
                       bool checked = await callMainCheckSuperUserPermission();
                       if (checked) {
                         onUnlock();

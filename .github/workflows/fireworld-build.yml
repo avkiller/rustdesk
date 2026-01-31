@@ -821,7 +821,7 @@ jobs:
         if: env.ANDROID_SIGNING_KEY != null && env.UPLOAD_ARTIFACT == 'true'
         uses: softprops/action-gh-release@v2
         with:
-          prerelease: true
+          prerelease: false
           draft: true
           tag_name: ${{ env.TAG_NAME }}
           files: |

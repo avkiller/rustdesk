@@ -2018,7 +2018,9 @@ class _AccountState extends State<_Account> {
 
   Widget accountAction() {
     return Obx(() => _Button(
-        gFFI.userModel.userName.value.isEmpty ? 'Login' : 'Logout',
+        gFFI.userModel.userName.value.isEmpty
+            ? 'Login'
+            : '${translate('Logout')} (${gFFI.userModel.accountLabelWithHandle})',
         () => {
               gFFI.userModel.userName.value.isEmpty
                   ? loginDialog()
@@ -2039,6 +2041,10 @@ class _AccountState extends State<_Account> {
           offstage: gFFI.userModel.userName.value.isEmpty,
           child: Column(
             children: [
+              if (gFFI.userModel.displayName.value.trim().isNotEmpty &&
+                  gFFI.userModel.displayName.value.trim() !=
+                      gFFI.userModel.userName.value.trim())
+                text('Display Name', gFFI.userModel.displayName.value.trim()),
               text('Username', gFFI.userModel.userName.value),
               // text('Group', gFFI.groupModel.groupName.value),
             ],
@@ -2132,7 +2138,9 @@ class _PluginState extends State<_Plugin> {
 
   Widget accountAction() {
     return Obx(() => _Button(
-        gFFI.userModel.userName.value.isEmpty ? 'Login' : 'Logout',
+        gFFI.userModel.userName.value.isEmpty
+            ? 'Login'
+            : '${translate('Logout')} (${gFFI.userModel.accountLabelWithHandle})',
         () => {
               gFFI.userModel.userName.value.isEmpty
                   ? loginDialog()

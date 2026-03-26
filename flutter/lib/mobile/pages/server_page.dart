@@ -600,6 +600,7 @@ class _PermissionCheckerState extends State<PermissionChecker> {
                       label: Text(translate("Stop service")))
                   .marginOnly(bottom: 8)
               : SizedBox.shrink(),
+          if (!hideStopService || !serverModel.mediaOk)
           PermissionRow(
               translate("Screen Capture"),
               serverModel.mediaOk,

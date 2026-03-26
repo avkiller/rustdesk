@@ -150,7 +150,8 @@ class _DropDownAction extends StatelessWidget {
             }
 
             if (value == kUsePermanentPassword &&
-                (await bind.mainGetPermanentPassword()).isEmpty) {
+                (await bind.mainGetCommon(key: "permanent-password-set")) !=
+                    "true") {
               if (isChangePermanentPasswordDisabled()) {
                 callback();
                 return;
@@ -583,10 +584,13 @@ class _PermissionCheckerState extends State<PermissionChecker> {
   Widget build(BuildContext context) {
     final serverModel = Provider.of<ServerModel>(context);
     final hasAudioPermission = androidVersion >= 30;
+    final hideStopService =
+        isAndroid &&
+            bind.mainGetBuildinOption(key: kOptionHideStopService) == 'Y';
     return PaddingCard(
         title: translate("Permissions"),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          serverModel.mediaOk
+          serverModel.mediaOk && !hideStopService
               ? ElevatedButton.icon(
                       style: ButtonStyle(
                           backgroundColor:

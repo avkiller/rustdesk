@@ -154,9 +154,9 @@ jobs:
             aarch64-linux-android)
               ANDROID_TARGET=arm64-v8a
             ;;
-            armv7-linux-androideabi)
-              ANDROID_TARGET=armeabi-v7a
-            ;;
+            # armv7-linux-androideabi)
+            #   ANDROID_TARGET=armeabi-v7a
+            # ;;
           esac
           if ! ./flutter/build_android_deps.sh "${ANDROID_TARGET}"; then
             find "${VCPKG_ROOT}/" -name "*.log" | while read -r _1; do
@@ -269,7 +269,7 @@ jobs:
 
       - name: Publish signed apk package
         if: env.ANDROID_SIGNING_KEY != null && env.UPLOAD_ARTIFACT == 'true'
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           prerelease: false
           draft: true
@@ -280,7 +280,7 @@ jobs:
 
       - name: Publish unsigned apk package
         if: env.ANDROID_SIGNING_KEY == null && env.UPLOAD_ARTIFACT == 'true'
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           prerelease: false
           draft: true

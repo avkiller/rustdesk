@@ -17,10 +17,8 @@ mod et;
 mod eu;
 mod fa;
 mod gu;
-mod gu;
 mod fr;
 mod he;
-mod hi;
 mod hi;
 mod hr;
 mod hu;
@@ -51,7 +49,6 @@ mod vi;
 mod ta;
 mod ge;
 mod fi;
-mod ml;
 mod ml;
 
 pub const LANGS: &[(&str, &str)] = &[
@@ -136,9 +133,6 @@ pub fn translate_locale(name: String, locale: &str) -> String {
         "sc" => sc::T.deref(),
         "ta" => ta::T.deref(),
         "ge" => ge::T.deref(),
-        "ml" => ml::T.deref(),
-        "hi" => hi::T.deref(),
-        "gu" => gu::T.deref(),
         "ml" => ml::T.deref(),
         "hi" => hi::T.deref(),
         "gu" => gu::T.deref(),

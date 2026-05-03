@@ -594,6 +594,16 @@ class _PermissionCheckerState extends State<PermissionChecker> {
     final permissionChangeLocked = isAndroid &&
         serverModel.clients.any((c) => !c.disconnected) &&
         !allowPermChangeInAcceptWindow;
+    final hideStopService = isAndroid &&
+        bind.mainGetBuildinOption(key: kOptionHideStopService) == 'Y';
+    final allowPermChangeInAcceptWindow = option2bool(
+        kOptionEnablePermChangeInAcceptWindow,
+        bind.mainGetBuildinOption(
+          key: kOptionEnablePermChangeInAcceptWindow,
+        ));
+    final permissionChangeLocked = isAndroid &&
+        serverModel.clients.any((c) => !c.disconnected) &&
+        !allowPermChangeInAcceptWindow;
     return PaddingCard(
         title: translate("Permissions"),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -625,6 +635,8 @@ class _PermissionCheckerState extends State<PermissionChecker> {
               ? PermissionRow(translate("Audio Capture"), serverModel.audioOk,
                   serverModel.toggleAudio,
                   enabled: !permissionChangeLocked)
+                  serverModel.toggleAudio,
+                  enabled: !permissionChangeLocked)
               : Row(children: [
                   Icon(Icons.info_outline).marginOnly(right: 15),
                   Expanded(
@@ -639,6 +651,12 @@ class _PermissionCheckerState extends State<PermissionChecker> {
             serverModel.toggleClipboard,
             enabled: !permissionChangeLocked,
           ),
+          PermissionRow(
+            translate("Enable clipboard"),
+            serverModel.clipboardOk,
+            serverModel.toggleClipboard,
+            enabled: !permissionChangeLocked,
+          ),
         ]));
   }
 }
@@ -646,11 +664,14 @@ class _PermissionCheckerState extends State<PermissionChecker> {
 class PermissionRow extends StatelessWidget {
   const PermissionRow(this.name, this.isOk, this.onPressed,
       {Key? key, this.enabled = true})
+  const PermissionRow(this.name, this.isOk, this.onPressed,
+      {Key? key, this.enabled = true})
       : super(key: key);
 
   final String name;
   final bool isOk;
   final VoidCallback onPressed;
+  final bool enabled;
   final bool enabled;
 
   @override
@@ -660,6 +681,11 @@ class PermissionRow extends StatelessWidget {
         contentPadding: EdgeInsets.all(0),
         title: Text(name),
         value: isOk,
+        onChanged: enabled
+            ? (bool value) {
+                onPressed();
+              }
+            : null);
         onChanged: enabled
             ? (bool value) {
                 onPressed();

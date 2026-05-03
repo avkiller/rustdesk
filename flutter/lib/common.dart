@@ -80,6 +80,7 @@ DesktopType? desktopType;
 
 // Tolerance used for floating-point position comparisons to avoid precision errors.
 const double _kPositionEpsilon = 1e-6;
+
 bool get isMainDesktopWindow =>
     desktopType == DesktopType.main || desktopType == DesktopType.cm;
 
@@ -110,6 +111,7 @@ enum DesktopType {
   cm,
   portForward,
 }
+
 bool isDoubleEqual(double a, double b) {
   return (a - b).abs() < _kPositionEpsilon;
 }
@@ -1678,6 +1680,7 @@ class LastWindowPosition {
 
   LastWindowPosition(this.width, this.height, this.offsetWidth,
       this.offsetHeight, this.isMaximized, this.isFullscreen);
+
   bool equals(LastWindowPosition other) {
     return ((width == other.width) &&
         (height == other.height) &&
@@ -1727,8 +1730,10 @@ String get windowFramePrefix =>
         : (bind.isOutgoingOnly() ? "outgoing_" : ""));
 
 typedef WindowKey = ({WindowType type, int? windowId});
+
 LastWindowPosition? _lastWindowPosition = null;
 final Debouncer _saveWindowDebounce = Debouncer(delay: Duration(seconds: 1));
+
 /// Save window position and size on exit
 /// Note that windowId must be provided if it's subwindow
 Future<void> saveWindowPosition(WindowType type,
@@ -1813,8 +1818,10 @@ Future<void> saveWindowPosition(WindowType type,
   final bool haveNewWindowPosition =
       (_lastWindowPosition == null) || !pos.equals(_lastWindowPosition!);
   final bool isPreviousNewWindowPositionPending = _saveWindowDebounce.isRunning;
+
   if (haveNewWindowPosition || isPreviousNewWindowPositionPending) {
     _lastWindowPosition = pos;
+
     if (flush ?? false) {
       // If a previous update is pending, replace it.
       _saveWindowDebounce.cancel();
@@ -4112,6 +4119,7 @@ String decode_http_response(http.Response resp) {
     return resp.body;
   }
 }
+
 bool peerTabShowNote(PeerTabIndex peerTabIndex) {
   return peerTabIndex == PeerTabIndex.ab || peerTabIndex == PeerTabIndex.group;
 }

@@ -282,6 +282,7 @@ jobs:
         with:
           prerelease: true
           tag_name: ${{ env.TAG_NAME }}
+          draft: true
           files: |
             ./SignOutput/rustdesk-*.msi
             ./SignOutput/rustdesk-*.exe
@@ -357,6 +358,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           prerelease: true
+          draft: true
           tag_name: ${{ env.TAG_NAME }}
           files: |
             rustdesk*-aarch64.dmg

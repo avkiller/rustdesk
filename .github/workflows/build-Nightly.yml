@@ -19,4 +19,4 @@ jobs:
     secrets: inherit
     with:
       upload-artifact: true
-      upload-tag: "${{ inputs.upload-tag }}"
+      upload-tag: "${{ inputs.version }}"

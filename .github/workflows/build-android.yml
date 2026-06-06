@@ -5,6 +5,12 @@ on:
     # schedule build every night
     # - cron: "0 0 * * *"
   workflow_dispatch:
+    inputs:
+      version:
+        type: string
+        description: 'release tags(Default:1.4.7)'
+        required: true
+        default: '1.4.7'
 
 jobs:
   run-flutter-nightly-build:
@@ -12,4 +18,4 @@ jobs:
     secrets: inherit
     with:
       upload-artifact: true
-      upload-tag: "nightly"
+      upload-tag: "${{ inputs.upload-tag }}"

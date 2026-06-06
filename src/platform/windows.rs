@@ -614,6 +614,7 @@ fn authorize_service_scoped_ipc_connection(
             peer_session_id,
             expected_active_session_id,
             peer_is_system,
+            None,
         );
         return false;
     }
@@ -1321,6 +1322,23 @@ pub fn get_install_options() -> String {
         opts.insert(REG_NAME_INSTALL_PRINTER, printer);
     }
     serde_json::to_string(&opts).unwrap_or("{}".to_owned())
+}
+
+pub fn get_silent_install_options(printer_override: Option<bool>) -> &'static str {
+    let install_printer = match printer_override {
+        Some(override_value) => override_value,
+        None => {
+            let app_name = crate::get_app_name();
+            let subkey = format!(".{}", app_name.to_lowercase());
+            let printer = get_reg_of_hkcr(&subkey, REG_NAME_INSTALL_PRINTER);
+            printer.as_deref() == Some("1")
+        }
+    };
+    if install_printer && is_win_10_or_greater() {
+        "desktopicon startmenu printer"
+    } else {
+        "desktopicon startmenu"
+    }
 }
 
 // This function return Option<String>, because some registry value may be empty.

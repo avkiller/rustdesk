@@ -9,9 +9,9 @@ on:
     inputs:
       version:
         type: string
-        description: 'release tags(Default:1.4.7)'
+        description: 'release tags(Default:1.4.8)'
         required: true
-        default: '1.4.7'
+        default: '1.4.8'
 
 jobs:
   run-flutter-nightly-build:

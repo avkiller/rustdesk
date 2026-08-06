@@ -2499,6 +2499,9 @@ class _AboutState extends State<_About> {
                 SelectionArea(
                     child: Text('${translate('Fingerprint')}: $fingerprint')
                         .marginSymmetric(vertical: 4.0)),
+              SelectionArea(
+                  child: Text('${translate('ID')}: $myId')
+                      .marginSymmetric(vertical: 4.0)),
               // InkWell(
               //     onTap: () {
               //       launchUrlString('https://rustdesk.com/privacy.html');

@@ -78,7 +78,8 @@ class _SettingsState extends State<SettingsPage> with WidgetsBindingObserver {
   var _enableAbr = false;
   var _denyLANDiscovery = false;
   var _onlyWhiteList = false;
-  var _enableDirectIPAccess = true;
+  var _onlyIdWhiteList = false;
+  var _enableDirectIPAccess = false;
   var _enableRecordSession = false;
   var _enableHardwareCodec = true;
   var _allowWebSocket = false;
@@ -1016,6 +1017,14 @@ class _SettingsState extends State<SettingsPage> with WidgetsBindingObserver {
             //         child: Text(_fingerprint),
             //       ),
             //       leading: Icon(Icons.fingerprint)),
+	    SettingsTile(
+                onPressed: (context) => onCopyId(_myId),
+                title: Text(translate("ID")),
+                value: Padding(
+                  padding: EdgeInsets.symmetric(vertical: 8),
+                  child: Text(_myId),
+                ),
+                leading: Icon(Icons.perm_identity)),
             // SettingsTile(
             //   title: Text(translate("Privacy Statement")),
             //   onPressed: (context) =>

@@ -89,6 +89,7 @@ class _SettingsState extends State<SettingsPage> with WidgetsBindingObserver {
   var _directAccessPort = "";
   var _fingerprint = "";
   var _buildDate = "";
+  var _myId = "";
   var _autoDisconnectTimeout = "";
   var _hideServer = false;
   var _hideProxy = false;
@@ -109,6 +110,7 @@ class _SettingsState extends State<SettingsPage> with WidgetsBindingObserver {
     _denyLANDiscovery = !option2bool(kOptionEnableLanDiscovery,
         bind.mainGetOptionSync(key: kOptionEnableLanDiscovery));
     _onlyWhiteList = whitelistNotEmpty();
+    _onlyIdWhiteList = idWhitelistNotEmpty();
     _enableDirectIPAccess = option2bool(
         kOptionDirectServer, bind.mainGetOptionSync(key: kOptionDirectServer));
     _enableRecordSession = option2bool(kOptionEnableRecordSession,
@@ -217,6 +219,12 @@ class _SettingsState extends State<SettingsPage> with WidgetsBindingObserver {
       if (_buildDate != buildDate) {
         update = true;
         _buildDate = buildDate;
+      }
+
+      final myId = await bind.mainGetMyId();
+      if (_myId != myId) {
+        update = true;
+        _myId = myId;
       }
 
       final isUsingPublicServer = await bind.mainIsUsingPublicServer();
@@ -400,6 +408,29 @@ class _SettingsState extends State<SettingsPage> with WidgetsBindingObserver {
           }
 
           changeWhiteList(callback: update);
+        },
+      ),
+      SettingsTile.switchTile(
+        title: Row(children: [
+          Expanded(child: Text(translate('Use ID whitelisting'))),
+          Offstage(
+                  offstage: !_onlyIdWhiteList,
+                  child: const Icon(Icons.warning_amber_rounded,
+                      color: Color.fromARGB(255, 255, 204, 0)))
+              .marginOnly(left: 5)
+        ]),
+        initialValue: _onlyIdWhiteList,
+        onToggle: (_) async {
+          update() async {
+            final onlyIdWhiteList = idWhitelistNotEmpty();
+            if (onlyIdWhiteList != _onlyIdWhiteList) {
+              setState(() {
+                _onlyIdWhiteList = onlyIdWhiteList;
+              });
+            }
+          }
+
+          changeIdWhiteList(callback: update);
         },
       ),
       SettingsTile.switchTile(

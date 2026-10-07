@@ -1315,9 +1315,7 @@ class __DisplayPageState extends State<_DisplayPage> {
     return SettingsTile.switchTile(
       initialValue: value,
       title: Text(translate(label)),
-      onToggle: isOptFixed
-          ? null
-          : (b) async {
+      onToggle: (b) async {
               await setOtherDefaultSettingOption(
                 key,
                 b ? 'Y' : defaultOptionNo,

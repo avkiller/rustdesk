@@ -11,7 +11,7 @@ on:
         type: string
         description: 'release tags(Default:1.4.9)'
         required: true
-        default: '1.4.9'
+        default: '1.5.0'
 
 jobs:
   run-flutter-nightly-build:

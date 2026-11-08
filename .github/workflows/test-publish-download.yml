@@ -10,6 +10,11 @@ jobs:
       actions: read    # 读取其他 workflow 运行和 artifact 需要此权限
 
     steps:
+      - name: Checkout source code
+        uses: actions/checkout@v6
+        with:
+          submodules: recursive
+          
       - name: 获取 avk-build 最后一次成功运行的 run_id
         id: get-run
         env:

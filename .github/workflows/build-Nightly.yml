@@ -9,9 +9,13 @@ on:
     inputs:
       version:
         type: string
-        description: 'release tags(Default:1.4.9)'
+        description: 'release tags(Default:1.5.1)'
         required: true
-        default: '1.5.0'
+        default: '1.5.1'
+      skip-publish:
+        description: '跳过自动发布（稍后手动执行）'
+        type: boolean
+        default: false
 
 jobs:
   run-flutter-nightly-build:
@@ -20,3 +24,4 @@ jobs:
     with:
       upload-artifact: true
       upload-tag: "${{ inputs.version }}"
+      publish-release: ${{ !inputs.skip-publish }}

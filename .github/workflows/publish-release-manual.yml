@@ -1,0 +1,70 @@
+name: Manual Publish Release for avkiller
+
+on:
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: '可选：构建运行 ID（留空则自动使用最近一次成功运行）'
+        required: false
+        type: string
+      tag:
+        description: 'Release 标签'
+        required: true
+        default: '1.5.1'
+        type: string
+
+jobs:
+  publish:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - name: Resolve run_id
+        id: resolve
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ -n "${{ inputs.run_id }}" ]; then
+            RUN_ID="${{ inputs.run_id }}"
+            echo "使用手动指定的 run_id: $RUN_ID"
+          else
+            RUN_ID=$(gh run list \
+              --workflow="build-Nightly.yml" \
+              --status success \
+              --limit 1 \
+              --json databaseId \
+              --jq '.[0].databaseId')
+            if [ -z "$RUN_ID" ] || [ "$RUN_ID" = "null" ]; then
+              echo "未找到成功的运行记录"
+              exit 1
+            fi
+            echo "自动选择最近一次成功运行: $RUN_ID"
+          fi
+          echo "run_id=$RUN_ID" >> "$GITHUB_OUTPUT"
+
+      - name: Download Windows files
+        uses: actions/download-artifact@v8
+        with:
+          name: rustdesk-release-files-windows
+          path: ./release-assets/windows
+          run-id: ${{ steps.resolve.outputs.run_id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Download Android files
+        uses: actions/download-artifact@v8
+        with:
+          name: rustdesk-release-files-android
+          path: ./release-assets/android
+          run-id: ${{ steps.resolve.outputs.run_id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish to Release
+        uses: softprops/action-gh-release@v3
+        with:
+          tag_name: ${{ inputs.tag }}
+          draft: true
+          files: |
+            ./release-assets/windows/*.msi
+            ./release-assets/windows/*.exe
+            ./release-assets/android/*.apk

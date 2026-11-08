@@ -1,0 +1,76 @@
+name: Test Publish Download
+
+on:
+  workflow_dispatch:  # 手动触发，方便反复测试
+
+jobs:
+  test-download:
+    runs-on: ubuntu-24.04
+    permissions:
+      actions: read    # 读取其他 workflow 运行和 artifact 需要此权限
+
+    steps:
+      - name: 获取 avk-build 最后一次成功运行的 run_id
+        id: get-run
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # 用 gh 命令查找指定 workflow 最近一次成功的运行
+          RUN_ID=$(gh run list \
+            --workflow="build-Nightly.yml" \
+            --status success \
+            --limit 1 \
+            --json databaseId \
+            --jq '.[0].databaseId')
+          
+          if [ -z "$RUN_ID" ]; then
+            echo "未找到成功的运行记录"
+            exit 1
+          fi
+          
+          echo "找到 run_id: $RUN_ID"
+          echo "run_id=$RUN_ID" >> "$GITHUB_OUTPUT"
+
+      - name: 下载 Android release files（模拟 publish_release）
+        uses: actions/download-artifact@v8
+        with:
+          name: rustdesk-release-files-android
+          path: ./release-assets/android
+          run-id: ${{ steps.get-run.outputs.run_id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 下载 Windows release files（模拟 publish_release）
+        uses: actions/download-artifact@v8
+        with:
+          name: rustdesk-release-files-windows
+          path: ./release-assets/windows
+          run-id: ${{ steps.get-run.outputs.run_id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 验证下载结果（关键步骤）
+        run: |
+          echo "===== 下载目录结构 ====="
+          find ./release-assets -type f | sort
+          
+          echo ""
+          echo "===== 检查 publish_release 预期的 glob 匹配 ====="
+          
+          # 模拟你 publish_release 里写的 glob
+          echo "--- 匹配 ./release-assets/android/*.apk ---"
+          ls -la ./release-assets/android/*.apk 2>/dev/null || echo "没有匹配到 apk 文件"
+          
+          echo "--- 匹配 ./release-assets/windows/*.msi ---"
+          ls -la ./release-assets/windows/*.msi 2>/dev/null || echo "没有匹配到 msi 文件"
+          
+          echo "--- 匹配 ./release-assets/windows/*.exe ---"
+          ls -la ./release-assets/windows/*.exe 2>/dev/null || echo "没有匹配到 exe 文件"
+
+      - name: 用 softprops 的 glob 方式再验证一次（只打印不发布）
+        run: |
+          # 这里手动模拟 action-gh-release 的 files 解析逻辑
+          # 如果上面 ls 能匹配到文件，说明 files: |
+          #   ./release-assets/android/*.apk
+          #   ./release-assets/windows/*.msi
+          #   ./release-assets/windows/*.exe
+          # 这种写法是可行的
+          echo "如果上面的 ls 命令有输出，说明修正后的 files glob 写法有效。"

@@ -230,7 +230,7 @@ pub static ref T: std::collections::HashMap<&'static str, &'static str> =
         ("Wrong credentials", "Неправильные учётные данные"),
         ("The verification code is incorrect or has expired", "Проверочный код неправильный или устарел"),
         ("Edit Tag", "Изменить метку"),
-        ("Forget Password", "Не сохранять пароль"),
+        ("Forget Password", "Удалить сохранённый пароль"),
         ("Favorites", "Избранное"),
         ("Add to Favorites", "Добавить в избранное"),
         ("Remove from Favorites", "Удалить из избранного"),
@@ -823,5 +823,8 @@ pub static ref T: std::collections::HashMap<&'static str, &'static str> =
         ("Please select Android → media.", "Выберите Android → media."),
         ("Trust duration (days)", "Срок доверия (в днях)"),
         ("Renew trust", "Продлить доверие"),
+        ("install-directory-not-empty-tip", "Выбранная папка не пуста. При установке существующие данные могут быть удалены. Рекомендуется выбрать другую папку."),
+        ("Request approval", "Запросить одобрение"),
+        ("Forever", "Навсегда"),
     ].iter().cloned().collect();
 }

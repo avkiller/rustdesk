@@ -230,7 +230,7 @@ pub static ref T: std::collections::HashMap<&'static str, &'static str> =
         ("Wrong credentials", "اعتبارنامه نادرست است"),
         ("The verification code is incorrect or has expired", "کد تأیید نادرست است یا منقضی شده است"),
         ("Edit Tag", "ویرایش برچسب"),
-        ("Forget Password", "رمز عبور ذخیره نشود"),
+        ("Forget Password", "پاک کردن رمز عبور ذخیره‌شده"),
         ("Favorites", "اتصالات دلخواه"),
         ("Add to Favorites", "افزودن به علاقه مندی ها"),
         ("Remove from Favorites", "از علاقه مندی ها حذف شود"),
@@ -823,5 +823,8 @@ pub static ref T: std::collections::HashMap<&'static str, &'static str> =
         ("Please select Android → media.", "لطفاً Android → media را انتخاب کنید."),
         ("Trust duration (days)", "مدت اعتماد (روز)"),
         ("Renew trust", "تمدید اعتماد"),
+        ("install-directory-not-empty-tip", "پوشه انتخاب‌شده خالی نیست. نصب ممکن است داده‌های موجود را حذف کند. بهتر است پوشه دیگری انتخاب کنید."),
+        ("Request approval", "درخواست تأیید"),
+        ("Forever", "برای همیشه"),
     ].iter().cloned().collect();
 }

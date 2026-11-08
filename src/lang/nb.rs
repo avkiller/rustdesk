@@ -230,7 +230,7 @@ pub static ref T: std::collections::HashMap<&'static str, &'static str> =
         ("Wrong credentials", "Feil brukernavn og/eller passord"),
         ("The verification code is incorrect or has expired", "Verifikasjonskoden er feil eller utløpt"),
         ("Edit Tag", "Rediger tagg"),
-        ("Forget Password", "Glem passord"),
+        ("Forget Password", "Slett lagret passord"),
         ("Favorites", "Favoritter"),
         ("Add to Favorites", "Legg til favoritter"),
         ("Remove from Favorites", "Fjern favoritter"),
@@ -823,5 +823,8 @@ pub static ref T: std::collections::HashMap<&'static str, &'static str> =
         ("Please select Android → media.", "Velg Android → media."),
         ("Trust duration (days)", "Klareringsperiode (dager)"),
         ("Renew trust", "Forny klarering"),
+        ("install-directory-not-empty-tip", "Den valgte mappen er ikke tom. Installasjonen kan slette eksisterende data. Vurder å velge en annen mappe."),
+        ("Request approval", "Be om godkjenning"),
+        ("Forever", "For alltid"),
     ].iter().cloned().collect();
 }
